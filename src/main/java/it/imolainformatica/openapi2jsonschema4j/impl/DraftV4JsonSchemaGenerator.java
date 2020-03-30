@@ -1,39 +1,28 @@
 package it.imolainformatica.openapi2jsonschema4j.impl;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.processors.syntax.SyntaxValidator;
 
-import io.swagger.inflector.examples.ExampleBuilder;
-import io.swagger.inflector.examples.models.Example;
-import io.swagger.inflector.processors.JsonNodeExampleSerializer;
 import io.swagger.models.AbstractModel;
 import io.swagger.models.ArrayModel;
 import io.swagger.models.Model;
 import io.swagger.models.ModelImpl;
 import io.swagger.models.Swagger;
-import io.swagger.util.Json;
 import it.imolainformatica.openapi2jsonschema4j.base.BaseJsonSchemaGenerator;
 import it.imolainformatica.openapi2jsonschema4j.base.IJsonSchemaGenerator;
 import lombok.extern.slf4j.Slf4j;
