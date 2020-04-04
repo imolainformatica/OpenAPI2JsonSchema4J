@@ -7,6 +7,16 @@
 	<artifactId>openapi2jsonschema4j</artifactId>
 	<version>1.0.0</version>
 	<packaging>maven-plugin</packaging>
+	
+	 <name>OpenAPI2JsonSchema4J</name>
+    <description>Maven plugin used convert swagger 2.0 models to json schema draft 4 files</description>
+    <url>https://github.com/imolainformatica/OpenAPI2JsonSchema4J</url>
+    <inceptionYear>2020</inceptionYear>
+    
+    <organization>
+        <name>Imola Informatica S.P.A.</name>
+        <url>http://www.imolinfo.it/</url>
+    </organization>
 
 	<developers>
 		<developer>
