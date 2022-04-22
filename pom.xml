@@ -373,7 +373,7 @@
 		<dependency>
 			<groupId>io.swagger</groupId>
 			<artifactId>swagger-parser</artifactId>
-			<version>1.0.50</version>
+			<version>1.0.54</version>
 		</dependency>
 
 		<dependency>

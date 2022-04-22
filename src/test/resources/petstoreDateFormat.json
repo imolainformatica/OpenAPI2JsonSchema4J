@@ -121,13 +121,16 @@
           "format": "int64"
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^string$"
+        },
+        "birth-date": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
         },
         "tag": {
           "type": "string"
-        },
-        "extraInfo": {
-          "$ref": "#/definitions/Info"
         }
       }
     },
@@ -148,95 +151,6 @@
           "format": "int32"
         },
         "message": {
-          "type": "string"
-        }
-      }
-    },
-    "Info": {
-      "required": [
-        "name",
-        "message"
-      ],
-      "properties": {
-        "code": {
-          "type": "string"
-        },
-        "surname": {
-          "type": "string"
-        },
-        "nested": {
-          "$ref": "#/definitions/Info2"
-        }
-      }
-    },
-    "Info2": {
-      "required": [
-        "pippo",
-        "pluto"
-      ],
-      "properties": {
-        "pippo": {
-          "type": "string"
-        },
-        "pluto": {
-          "type": "string"
-        },
-        "circularInfo": {
-          "$ref": "#/definitions/Info"
-        },
-        "elements": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Info3"
-          }
-        },
-        "new": {
-          "type": "object",
-          "properties": {
-            "y": {
-              "type": "string"
-            },
-            "x": {
-              "$ref": "#/definitions/Info5"
-            }
-          }
-        }
-      }
-    },
-    "Info3": {
-      "required": [
-        "test"
-      ],
-      "properties": {
-        "test": {
-          "type": "string"
-        },
-        "elements2": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "test": {
-                "type": "string"
-              },
-              "obj": {
-                "$ref": "#/definitions/Info4"
-              }
-            }
-          }
-        }
-      }
-    },
-    "Info4": {
-      "properties": {
-        "test2": {
-          "type": "string"
-        }
-      }
-    },
-    "Info5": {
-      "properties": {
-        "test3": {
           "type": "string"
         }
       }

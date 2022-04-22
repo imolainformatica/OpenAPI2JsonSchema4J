@@ -41,6 +41,13 @@ public class TestGeneration extends AbstractIT{
 	public void testPetStoreWithStrict() {
 		testForSwagger("petstore.json"); 
 	}
+
+
+
+	@Test
+	public void testPetStoreWithStrictAndDateFormatAndPattern() {
+		testForSwagger("petstoreDateFormat.json");
+	}
 	
 	/*@Test
 	public void testDefaultSwaggerYamlWithStrict() {
@@ -48,18 +55,20 @@ public class TestGeneration extends AbstractIT{
 	}*/
 
 	private void testForSwagger(String swaggerFile) {
-		log.info("Test for swagger {}",swaggerFile);
+		log.info("Test for swagger {}", swaggerFile);
 		File f = loadFromResourceFile(swaggerFile);
 		IJsonSchemaGenerator jsg = new JsonSchemaGeneratorBuilder().withOutputSchemaVersion(JsonSchemaVersion.DRAFT_V4).withStrictGeneration(true).build();
 		try {
 			Map<String, JsonNode> gen = jsg.generate(f);
-			new JsonSchemaOutputWriter().saveJsonSchemaFiles(gen,new File("target/generatedJsonSchema"));
-			testGeneratedJsonSchema(f,gen);
+			new JsonSchemaOutputWriter().saveJsonSchemaFiles(gen, new File("target/generatedJsonSchema/"+swaggerFile));
+			testGeneratedJsonSchema(f, gen);
 		} catch (Exception e) {
+			log.error("Unexpected exception" + e.getMessage(), e);
 			fail("Unexpected exception");
-			log.error("Unexpected exception"+e.getMessage(),e);
+
 		}
 	}
+
 
 	private void testGeneratedJsonSchema(File f, Map<String, JsonNode> gen) throws ProcessingException, IOException {
 		Swagger swagger = new SwaggerParser().read(f.getAbsolutePath());

@@ -1,0 +1,1484 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Integrazione",
+    "description": "Il presente documento descrive i servizi di integrazione con il tool XXXX creati <hr><br><b><u>REVISIONI</u></b><br><br> <table><tr><td width='150'><strong>Data modifica</strong></td><td width='100'><strong>Versione</strong></td><td width='150'><strong>Autore</strong></td><td><strong>Modifica</strong></td></tr> <tr><td>14/09/2020</td><td>1.0.0</td><td>F.Gandelli - Almaviva</td><td>Prima versione</td></tr> <tr><td>05/11/2020</td><td>1.0.4</td><td>F.Gandelli - Almaviva</td><td>Riscrittura in OAS 2.0</td></tr> <tr><td>05/11/2020-26/11/2020</td><td>1.0.5-1.011</td><td>F.Gandelli - Almaviva</td><td>Adeguamenti per Z-Connect e review servizi</td></tr> <tr><td>10/12/2020</td><td>1.0.12</td><td>F.Gandelli - Almaviva</td><td>Review post analisi architettura BancoBPM</td></tr></table><hr>",
+    "contact": {
+      "name": "",
+      "email": ""
+    },
+    "version": "1.0.12"
+  },
+  "externalDocs": {
+    "description": "",
+    "url": ""
+  },
+  "host": "",
+  "basePath": "/test/v1",
+  "tags": [
+    {
+      "name": "Questionario",
+      "description": "Questionario di conoscenza del cliente",
+      "externalDocs": {
+        "description": "",
+        "url": ""
+      }
+    },
+    {
+      "name": "Profilo di rischio",
+      "description": "Servizi per il calcolo del profilo di rischio del cliente"
+    }
+  ],
+  "paths": {
+    "/questionariIncompleti": {
+      "post": {
+        "tags": [
+          "Questionario"
+        ],
+        "summary": "Crea un nuovo questionario",
+        "operationId": "creaQuestionariIncompleti",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/Bbpm-Tt-IdOperazione-CodiceApplicazioneChiamante"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tt-IdOperazione-CodiceOperazione"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tt-IdCorrelazione"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-CodiceABI"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-CodiceCanale"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-CodiceApplicazioneChiamante"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-Cliente-CodiceNdg"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-Cliente-CodiceUtenzaIb-Identificativo-Utente"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-Cliente-CodiceUtenzaCb-Identificativo-Postazione"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-Cliente-CodiceUtenzaCb-Identificativo-Utente"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-UtenzaInterna-Matricola"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-UtenzaInterna-CodiceUnitaOrganizzativa"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-Controparte-IdControparte"
+          },
+          {
+            "name": "questionarioBody",
+            "in": "body",
+            "description": "Payload del messaggio, contiene i dati necessari per la creazione di un questionario",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreaQuestionario"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/QuestionarioCreatoConSuccesso"
+          },
+          "400": {
+            "$ref": "#/responses/Errore400"
+          },
+          "401": {
+            "$ref": "#/responses/Errore401"
+          },
+          "500": {
+            "$ref": "#/responses/Errore500"
+          },
+          "504": {
+            "$ref": "#/responses/Errore504"
+          }
+        }
+      }
+    },
+    "/verificaQuestionarioEProfiloDiRischio": {
+      "post": {
+        "tags": [
+          "Questionario",
+          "Profilo di rischio"
+        ],
+        "summary": "Recupera i dati dei questionari per i criteri indicati",
+        "description": "Il servizio di ricerca questionario viene usato anche per la Verifica Presenza del questionario: se il servizio restituisce almeno un record significa che il questionario è presente. Il servizio utilizza il metodo post perchè crea un dataset in risposta. Inoltre i criteri di ricerca sono molto complessi e possono essere meglio organizzati all'interno di un payload.",
+        "operationId": "getQuestionari",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "numeroElementiPerPagina",
+            "description": "numero dei record da restituire per la paginazione. Se non indicato tutti i record.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "numeroPagina",
+            "description": "numero della pagina da estrarre",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tt-IdOperazione-CodiceApplicazioneChiamante"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tt-IdOperazione-CodiceOperazione"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tt-IdCorrelazione"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-CodiceABI"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-CodiceCanale"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-CodiceApplicazioneChiamante"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-Cliente-CodiceNdg"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-Cliente-CodiceUtenzaIb-Identificativo-Utente"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-Cliente-CodiceUtenzaCb-Identificativo-Postazione"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-Cliente-CodiceUtenzaCb-Identificativo-Utente"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-UtenzaInterna-Matricola"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-UtenzaInterna-CodiceUnitaOrganizzativa"
+          },
+          {
+            "$ref": "#/parameters/Bbpm-Tc-Controparte-IdControparte"
+          },
+          {
+            "name": "criteriDiRicercaDTO",
+            "description": "oggetto che contiene i criteri di ricerca",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CriteriDiRicercaDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/FiltroEseguitoConSuccesso"
+          },
+          "400": {
+            "$ref": "#/responses/Errore400"
+          },
+          "401": {
+            "$ref": "#/responses/Errore401"
+          },
+          "404": {
+            "$ref": "#/responses/Errore404Questionario"
+          },
+          "500": {
+            "$ref": "#/responses/Errore500"
+          },
+          "503": {
+            "$ref": "#/responses/Errore503"
+          },
+          "504": {
+            "$ref": "#/responses/Errore504"
+          },
+          "default": {
+            "$ref": "#/responses/Errore500"
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "Bbpm-Tt-IdOperazione-CodiceApplicazioneChiamante": {
+      "name": "Bbpm-Tt-IdOperazione-CodiceApplicazioneChiamante",
+      "description": "Codice che identifica univocamente l'applicazione diretta chiamante. Sono ammesse stringhe non vuote (es. APSD2, YOUWEB, HD005 ...)",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "pattern": "^(?!\\s*$).+",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "Bbpm-Tt-IdOperazione-CodiceOperazione": {
+      "name": "Bbpm-Tt-IdOperazione-CodiceOperazione",
+      "description": "Codice univoco dell'operazione generata dall'applicativo chiamante. L'applicativo chiamante deve garantire l'univocità di questo codice all'interno del suo perimetro. È obbligatorio solo nelle operazione di non lettura",
+      "in": "header",
+      "required": false,
+      "type": "string",
+      "pattern": "^(?!\\s*$).+",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "Bbpm-Tt-IdCorrelazione": {
+      "name": "Bbpm-Tt-IdCorrelazione",
+      "description": "Codice univoco per la tracciatura su tutta la filiera delle chiamate (end to end).",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "pattern": "^(?!\\s*$).+",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "Bbpm-Tc-CodiceABI": {
+      "name": "Bbpm-Tc-CodiceABI",
+      "description": "Codice dell'istituto target del servizio. Sono ammesse stringhe numeriche composte esattamente da 5 caratteri (es. 05034, 03045, 03102 ...)",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "pattern": "^[0-9]{5}$",
+      "minLength": 5,
+      "maxLength": 5
+    },
+    "Bbpm-Tc-CodiceCanale": {
+      "name": "Bbpm-Tc-CodiceCanale",
+      "description": "Codice del canale di origine della chiamata",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50,
+      "enum": [
+        "SITO_PUBBLICO",
+        "CORPORATE_BANKING",
+        "INTERNET_BANKING",
+        "PSD2",
+        "FILIALE_CORPORATE",
+        "AGENZIA_RETAIL",
+        "UFFICI",
+        "MOBILE_PRIVATI",
+        "MOBILE_CORPORATE"
+      ]
+    },
+    "Bbpm-Tc-CodiceApplicazioneChiamante": {
+      "name": "Bbpm-Tc-CodiceApplicazioneChiamante",
+      "description": "Codice che identifica univocamente l'applicazione chiamante di canale dalla quale è partita la chiamata (FACEBOOK, APP, YOUWEB, NSR ...)",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "pattern": "^(?!\\s*$).+",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "Bbpm-Tc-Cliente-CodiceNdg": {
+      "name": "Bbpm-Tc-Cliente-CodiceNdg",
+      "description": "Codice ndg del cliente che sta effetutando l'operazione. Sono ammesse stringhe numeriche con lunghezza minima 1 e massima 12 (es. 000007865 ...)",
+      "in": "header",
+      "required": false,
+      "type": "string",
+      "pattern": "^[0-9]{1,9}$",
+      "minLength": 1,
+      "maxLength": 9
+    },
+    "Bbpm-Tc-Cliente-CodiceUtenzaIb-Identificativo-Utente": {
+      "name": "Bbpm-Tc-Cliente-CodiceUtenzaIb-Identificativo-Utente",
+      "description": "Identificativo dell'utente privato. Sono ammesse stringhe non vuote",
+      "in": "header",
+      "required": false,
+      "type": "string",
+      "pattern": "^(?!\\s*$).+",
+      "minLength": 1,
+      "maxLength": 30
+    },
+    "Bbpm-Tc-Cliente-CodiceUtenzaCb-Identificativo-Postazione": {
+      "name": "Bbpm-Tc-Cliente-CodiceUtenzaCb-Identificativo-Postazione",
+      "description": "Identificativo postazione dell'utente corporate. Sono ammesse stringhe non vuote",
+      "in": "header",
+      "required": false,
+      "type": "string",
+      "pattern": "^(?!\\s*$).+",
+      "minLength": 1,
+      "maxLength": 30
+    },
+    "Bbpm-Tc-Cliente-CodiceUtenzaCb-Identificativo-Utente": {
+      "name": "Bbpm-Tc-Cliente-CodiceUtenzaCb-Identificativo-Utente",
+      "description": "Identificativo dell'utente corporate. Sono ammesse stringhe non vuote",
+      "in": "header",
+      "required": false,
+      "type": "string",
+      "pattern": "^(?!\\s*$).+",
+      "minLength": 1,
+      "maxLength": 30
+    },
+    "Bbpm-Tc-UtenzaInterna-Matricola": {
+      "name": "Bbpm-Tc-UtenzaInterna-Matricola",
+      "description": "Matricola dell'utente interno. Sono ammesse stringhe non vuote",
+      "in": "header",
+      "required": false,
+      "type": "string",
+      "pattern": "^(?!\\s*$).+",
+      "minLength": 1,
+      "maxLength": 30
+    },
+    "Bbpm-Tc-UtenzaInterna-CodiceUnitaOrganizzativa": {
+      "name": "Bbpm-Tc-UtenzaInterna-CodiceUnitaOrganizzativa",
+      "description": "Codice dell'ufficio dell'utente interno. Sono ammesse stringhe non vuote",
+      "in": "header",
+      "required": false,
+      "type": "string",
+      "pattern": "^(?!\\s*$).+",
+      "minLength": 1,
+      "maxLength": 20
+    },
+    "Bbpm-Tc-Controparte-IdControparte": {
+      "name": "Bbpm-Tc-Controparte-IdControparte",
+      "description": "Identificativo di un eventuale entità esterna alla banca (es. PSD2, partner commerciale) che consuma servizi esposti dalla banca. Più precisamente è valorizzato con il nome o il codice della controparte (es. Facebook Inc). Sono ammesse stringhe non vuote",
+      "in": "header",
+      "required": false,
+      "type": "string",
+      "pattern": "^(?!\\s*$).+",
+      "minLength": 1,
+      "maxLength": 30
+    }
+  },
+  "responses": {
+    "FiltroEseguitoConSuccesso": {
+      "description": "filter successfully executed",
+      "headers": {
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceApplicazioneChiamante": {
+          "description": "Codice che identifica univocamente l'applicazione diretta chiamante, deve avere il medesimo valore di quanto ricevuto in input (obbligatorio)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceOperazione": {
+          "description": "Codice univoco dell'operazione generata dall'applicativo chiamante (obbligatorio per tutte le operzioni non di lettura)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-IdCorrelazione": {
+          "description": "Codice univoco per la tracciatura su tutta la filiera delle chiamate (obbligatorio). Deve essere un UUID",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-CodiceOperazioneRisposta": {
+          "description": "Codice univoco associato generato dal servizio associato alla risposta. Utile nelle invocazioni asincrone",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/FiltroQuestionarioDatasetDTO"
+      }
+    },
+    "QuestionarioCreatoConSuccesso": {
+      "description": "Questionario creato con successo. In Location sarà riportata l'url del questionario creato.",
+      "headers": {
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceApplicazioneChiamante": {
+          "description": "Codice che identifica univocamente l'applicazione diretta chiamante, deve avere il medesimo valore di quanto ricevuto in input (obbligatorio)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceOperazione": {
+          "description": "Codice univoco dell'operazione generata dall'applicativo chiamante (obbligatorio per tutte le operzioni non di lettura)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-IdCorrelazione": {
+          "description": "Codice univoco per la tracciatura su tutta la filiera delle chiamate (obbligatorio). Deve essere un UUID",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-CodiceOperazioneRisposta": {
+          "description": "Codice univoco associato generato dal servizio associato alla risposta. Utile nelle invocazioni asincrone",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Location": {
+          "description": "Url del questionario creato",
+          "type": "string",
+          "pattern": "^\\w+:(\\/?\\/?)[^\\s]+$",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      },
+      "schema": {
+
+
+              "$ref": "#/definitions/QuestionarioCreato"
+
+      }
+    },
+    "Errori": {
+      "description": "Id non valido",
+      "headers": {
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceApplicazioneChiamante": {
+          "description": "Codice che identifica univocamente l'applicazione diretta chiamante, deve avere il medesimo valore di quanto ricevuto in input (obbligatorio)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceOperazione": {
+          "description": "Codice univoco dell'operazione generata dall'applicativo chiamante (obbligatorio per tutte le operzioni non di lettura)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-IdCorrelazione": {
+          "description": "Codice univoco per la tracciatura su tutta la filiera delle chiamate (obbligatorio). Deve essere un UUID",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-CodiceOperazioneRisposta": {
+          "description": "Codice univoco associato generato dal servizio associato alla risposta. Utile nelle invocazioni asincrone",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/Eccezione"
+      }
+    },
+    "Errore404Questionario": {
+      "description": "Questionario non trovato",
+      "headers": {
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceApplicazioneChiamante": {
+          "description": "Codice che identifica univocamente l'applicazione diretta chiamante, deve avere il medesimo valore di quanto ricevuto in input (obbligatorio)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceOperazione": {
+          "description": "Codice univoco dell'operazione generata dall'applicativo chiamante (obbligatorio per tutte le operzioni non di lettura)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-IdCorrelazione": {
+          "description": "Codice univoco per la tracciatura su tutta la filiera delle chiamate (obbligatorio). Deve essere un UUID",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-CodiceOperazioneRisposta": {
+          "description": "Codice univoco associato generato dal servizio associato alla risposta. Utile nelle invocazioni asincrone",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/Eccezione"
+      }
+    },
+    "Errore400": {
+      "description": "Errore nei dati della richiesta",
+      "headers": {
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceApplicazioneChiamante": {
+          "description": "Codice che identifica univocamente l'applicazione diretta chiamante, deve avere il medesimo valore di quanto ricevuto in input (obbligatorio)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceOperazione": {
+          "description": "Codice univoco dell'operazione generata dall'applicativo chiamante (obbligatorio per tutte le operzioni non di lettura)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-IdCorrelazione": {
+          "description": "Codice univoco per la tracciatura su tutta la filiera delle chiamate (obbligatorio). Deve essere un UUID",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-CodiceOperazioneRisposta": {
+          "description": "Codice univoco associato generato dal servizio associato alla risposta. Utile nelle invocazioni asincrone",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/Eccezione"
+      }
+    },
+    "Errore401": {
+      "description": "Unauthorized",
+      "headers": {
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceApplicazioneChiamante": {
+          "description": "Codice che identifica univocamente l'applicazione diretta chiamante, deve avere il medesimo valore di quanto ricevuto in input (obbligatorio)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceOperazione": {
+          "description": "Codice univoco dell'operazione generata dall'applicativo chiamante (obbligatorio per tutte le operzioni non di lettura)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-IdCorrelazione": {
+          "description": "Codice univoco per la tracciatura su tutta la filiera delle chiamate (obbligatorio). Deve essere un UUID",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-CodiceOperazioneRisposta": {
+          "description": "Codice univoco associato generato dal servizio associato alla risposta. Utile nelle invocazioni asincrone",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/Eccezione"
+      }
+    },
+    "Errore504": {
+      "description": "Timeout - Il servizio non risponde nei tempi previsti. Non è noto l'esito dell'operazione",
+      "headers": {
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceApplicazioneChiamante": {
+          "description": "Codice che identifica univocamente l'applicazione diretta chiamante, deve avere il medesimo valore di quanto ricevuto in input (obbligatorio)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceOperazione": {
+          "description": "Codice univoco dell'operazione generata dall'applicativo chiamante (obbligatorio per tutte le operzioni non di lettura)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-IdCorrelazione": {
+          "description": "Codice univoco per la tracciatura su tutta la filiera delle chiamate (obbligatorio). Deve essere un UUID",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-CodiceOperazioneRisposta": {
+          "description": "Codice univoco associato generato dal servizio associato alla risposta. Utile nelle invocazioni asincrone",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/Eccezione"
+      }
+    },
+    "Errore500": {
+      "description": "Errore interno all'applicazione",
+      "headers": {
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceApplicazioneChiamante": {
+          "description": "Codice che identifica univocamente l'applicazione diretta chiamante, deve avere il medesimo valore di quanto ricevuto in input (obbligatorio)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceOperazione": {
+          "description": "Codice univoco dell'operazione generata dall'applicativo chiamante (obbligatorio per tutte le operzioni non di lettura)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-IdCorrelazione": {
+          "description": "Codice univoco per la tracciatura su tutta la filiera delle chiamate (obbligatorio). Deve essere un UUID",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-CodiceOperazioneRisposta": {
+          "description": "Codice univoco associato generato dal servizio associato alla risposta. Utile nelle invocazioni asincrone",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/Eccezione"
+      }
+    },
+    "Errore503": {
+      "description": "Servizio non disponibile",
+      "headers": {
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceApplicazioneChiamante": {
+          "description": "Codice che identifica univocamente l'applicazione diretta chiamante, deve avere il medesimo valore di quanto ricevuto in input (obbligatorio)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "Bbpm-Tt-IdOperazioneRichiesta-CodiceOperazione": {
+          "description": "Codice univoco dell'operazione generata dall'applicativo chiamante (obbligatorio per tutte le operzioni non di lettura)",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-IdCorrelazione": {
+          "description": "Codice univoco per la tracciatura su tutta la filiera delle chiamate (obbligatorio). Deve essere un UUID",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Bbpm-Tt-CodiceOperazioneRisposta": {
+          "description": "Codice univoco associato generato dal servizio associato alla risposta. Utile nelle invocazioni asincrone",
+          "type": "string",
+          "pattern": "^(?!\\s*$).+",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/Eccezione"
+      }
+    }
+  },
+  "definitions": {
+    "CriteriDiRicercaDTO": {
+      "description": "oggetto che descrive i criteri di ricerca di un questionario supportarti da Gianos",
+      "type": "object",
+      "required": [
+        "codiceAbi",
+        "tipoRichiesta",
+        "tipoQuestionario",
+        "tipoChiaveRicercaQuestionario"
+      ],
+      "properties": {
+        "codiceAbi": {
+          "description": "Codice dell'istituto target del servizio",
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 5,
+          "example": "05034"
+        },
+        "tipoRichiesta": {
+          "description": "Tipologia di richiesta<table><tr><th><u>Parametro</u></th><th><u>Significato</u></th></tr><tr><td>PRESENZA_QAV_VALIDO</td><td>Presenza QAV valido. In questo caso lo stato questionario sarà ignorato</td></tr><tr><td>RICERCA_GENERICA</td><td>Ricerca di questionari secondo i criteri indicati</td></tr><tr><td>ASSENZA_QAV_VALIDO</td><td>Ricerca di questionari mancanti sui conti collegati al cliente o sul conto indicato</td></tr></table><br>Example: 'PRESENZA_QAV_VALIDO'",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "enum": [
+            "PRESENZA_QAV_VALIDO",
+            "RICERCA_GENERICA",
+            "ASSENZA_QAV_VALIDO"
+          ]
+        },
+        "tipoQuestionario": {
+          "description": "Tipologia di questionario ricercato.<br>Example: OperazioneOccasionale",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "enum": [
+            "APERTURA_RAPPORTO",
+            "AGGIORNAMENTO_RAPPORTO",
+            "OPERAZIONE_OCCASIONALE",
+            "APPROFONDIMENTO_OPERAZIONE_SU_RAPPORTO"
+          ]
+        },
+        "statoQuestionario": {
+          "description": "Stato del questionario. Ignorato se tipoRichiesta = 01 perchè include già lo stato del questionario (valido, cioè confermato)",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 50,
+          "enum": [
+            "INCOMPLETO",
+            "CONFERMATO_NON_CALCOLATO",
+            "CONFERMATO",
+            "ANNULLATO",
+            "STORNATO"
+          ],
+          "default": "INCOMPLETO"
+        },
+        "codiceNdgCliente": {
+          "description": "Codice NDG del soggetto che sta eseguendo l'operazione e ha compilato il questionario. <br>Example: '1045379'",
+          "type": "string",
+          "maxLength": 9,
+          "minLength": 1
+        },
+        "tipoChiaveRicercaQuestionario": {
+          "description": "Indica il tipo di chiave che si vuole usare. OpenApi 2 non permette di usare OneOf, occorre quindi definire in questo modo il parametro che è il discriminator di un OneOf.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "enum": [
+            "IDENTIFICATIVO_GIANOS",
+            "CHIAVE_RAPPORTO",
+            "CHIAVE_RAPPORTO_CARTE",
+            "CHIAVE_ALTERNATIVA_LEGACY",
+            "CHIAVE_OPERAZIONE"
+          ]
+        },
+        "identificativoQuestionario": {
+          "description": "Filtra usando l'identificativo del questionario su Gianos. <strong>Questo filtro è alternativo agli altri filtri</strong><br>Example: 190890",
+          "type": "integer",
+          "format": "int32"
+        },
+        "chiaveRicercaOggetto": {
+          "$ref": "#/definitions/ChiaveRicercaOggettoQuestionario"
+        },
+        "chiaveRicercaGianos3D": {
+          "$ref": "#/definitions/ChiaveRicercaGianos3D"
+        }
+      }
+    },
+    "Operazione": {
+      "description": "Operazione inserita in un questionario",
+      "type": "object",
+      "required": [
+        "identificativoOperazione"
+      ],
+      "properties": {
+        "identificativoOperazione": {
+          "$ref": "#/definitions/IdentificativoOperazione"
+        },
+        "dettaglioOperazione": {
+          "$ref": "#/definitions/DettaglioOperazione"
+        }
+      }
+    },
+    "ChiaveRicercaOggettoQuestionario": {
+      "description": "Chiavi alternative per andare a ricercare i questionari. Esattamente una fra le proprietà dell'oggetto",
+      "type": "object",
+      "properties": {
+        "filtroRapportoGenerico": {
+          "$ref": "#/definitions/IdentificativoRapportoGenerico"
+        },
+        "filtroRapportoProvvisorio": {
+          "$ref": "#/definitions/IdentificativoRapportoProvvisorio"
+        },
+        "parametriRicercaOperazione": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/Operazione"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "ora": {
+                  "description": "Filtro usato da Gianos 3D.",
+                  "type": "string",
+                  "minLength": 20,
+                  "maxLength": 25
+                },
+                "intervallo": {
+                  "description": "Filtro usato da Gianos 3D.",
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 5
+                },
+                "codiceSae": {
+                  "description": "Filtro usato da Gianos 3D.",
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 3
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ChiaveRicercaGianos3D": {
+      "description": "chiave mantenuta per retrocompatibilità con Gianos 3D",
+      "type": "object",
+      "required": [
+        "codiceFilialeCompilazioneQuestionario",
+        "dataInserimentoQuestionario"
+      ],
+      "properties": {
+        "codiceFilialeCompilazioneQuestionario": {
+          "description": "codice della filiale di compilazione del questionario",
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 5,
+          "example": "00100"
+        },
+        "dataInserimentoQuestionario": {
+          "description": "data di inserimento del questionario. Formato: AAAA-MM-GG",
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 10,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "example": "2020-02-02"
+        }
+      }
+    },
+    "FiltroQuestionarioDatasetDTO": {
+      "description": "dataset di risposta del servizio di ricerca",
+      "type": "object",
+      "properties": {
+        "statoAdeguataVerifica": {
+          "description": "Codice Esito, usato per segnalare in caso di tipo ricerca QAV valido (negli altri casi non serve) per dare un semaforo. <br> True  -> Esito ok <br> False -> Adeguata verifica non in stato ok per tutti questionari associati a rapporto oggetto di ricerca. Serve in caso ad esempio per cointestatatari che non hanno questionario in stato confermato",
+          "type": "boolean",
+          "example": true
+        },
+        "listaDatiAdeguataVerifica": {
+          "description": "elenco dei questionari trovati che incontrano i criteri di ricerca. Sono riportati solo i dati sommari.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/definitions/DatiAdeguataVerifica"
+          }
+        }
+      }
+    },
+    "DatiAdeguataVerifica": {
+      "description": "Dati di adeguata verifica",
+      "type": "object",
+      "properties": {
+        "codiceNdgCliente": {
+          "description": "codice del soggetto che ha compilato il questionario",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 9
+        },
+        "questionari": {
+          "description": "Identificativo del questionario su Gianos",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Questionario"
+          }
+        },
+        "datiProfilo": {
+          "$ref": "#/definitions/DatiProfiloDiRischio"
+        }
+      }
+    },
+    "Questionario": {
+      "description": "Dettagli di un questionario",
+      "type": "object",
+      "required": [
+        "identificativoQuestionario",
+        "codiceFilialeInserimento"
+      ],
+      "properties": {
+        "identificativoQuestionario": {
+          "description": "Identificativo del questionario",
+          "type": "integer",
+          "format": "int32"
+        },
+        "statoQuestionario": {
+          "description": "stato del questionario",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "enum": [
+            "INCOMPLETO",
+            "CONFERMATO_NON_CALCOLATO",
+            "CONFERMATO",
+            "ANNULLATO",
+            "STORNATO"
+          ]
+        },
+        "codiceFilialeInserimento": {
+          "description": "Filiale che ha raccolto la compilazione del questionario",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 5,
+          "pattern": "^\\d{1,5}$"
+        },
+        "codiceOperatore": {
+          "description": "Utente che ha salvato per l'ultima volta i dati del questionario",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "codiceNdgCliente": {
+          "description": "codice del soggetto che ha compilato il questionario",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 9
+        },
+        "dataInserimento": {
+          "description": "Data in cui è stato inserito il questionario per la prima volta",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "example": "2020-02-02",
+          "minLength": 10,
+          "maxLength": 10
+        },
+        "dataStatoAggiornamento": {
+          "description": "data in cui il questionario ha cambiato stato l'ultima volta",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "example": "2020-02-02",
+          "minLength": 10,
+          "maxLength": 10
+        }
+      }
+    },
+    "DatiProfiloDiRischio": {
+      "type": "object",
+      "properties": {
+        "profiloRischio": {
+          "description": "fascia di rischio a cui è stato assegnato il soggetto",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "punteggioRischio": {
+          "description": "valore del punteggio di rischio che ha determinato la fascia di appartenenza",
+          "type": "integer",
+          "format": "int64"
+        },
+        "dataScadenzaProfilo": {
+          "description": "Data di scadenza del profilo oltre la quale è richiesto l'aggiornamento del questionario",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "example": "2020-02-02",
+          "minLength": 10,
+          "maxLength": 10
+        },
+        "presenzaWorkflow": {
+          "description": "Indicatore di presenza di un workflow attivo. TRUE = presente, FALSE = assente",
+          "type": "boolean",
+          "example": true
+        },
+        "workflow": {
+          "$ref": "#/definitions/WorkflowProfiloDiRischio"
+        }
+      }
+    },
+    "WorkflowProfiloDiRischio": {
+      "description": "Dati del workflow",
+      "type": "object",
+      "properties": {
+        "filiale": {
+          "description": "Filiale su cui si appoggia la pratica di workflow attivo",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 5,
+          "pattern": "^\\d{1,5}$"
+        },
+        "tipo": {
+          "description": "tipologia di workflow - Ordinario / Rafforzato / Pep",
+          "type": "string",
+          "example": "Ordinario",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "dataCreazione": {
+          "description": "data di creazione del workflow",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "example": "2020-02-02",
+          "minLength": 10,
+          "maxLength": 10
+        },
+        "evento": {
+          "description": "codice dell'evento che ha generato il workflow",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30
+        }
+      }
+    },
+    "IdentificativoRapportoGenerico": {
+      "description": "Identificativo di un rapporto secondo lo standard Banco BPM",
+      "type": "object",
+      "properties": {
+        "codiceFiliale": {
+          "description": "Codice della filiale",
+          "type": "string",
+          "pattern": "^[0-9]{1,5}$",
+          "minLength": 1,
+          "maxLength": 5,
+          "example": 102
+        },
+        "tipologiaServizio": {
+          "description": "Codice del tipo servizio",
+          "type": "string",
+          "pattern": "^[\\w]{3}$",
+          "minLength": 3,
+          "maxLength": 3
+        },
+        "tipologiaCategoria": {
+          "description": "Indica il tipo di conto. Da questo campo sarà transcodificata la natura del rapporto.",
+          "type": "string",
+          "pattern": "^[\\w]{4}$",
+          "minLength": 4,
+          "maxLength": 4
+        },
+        "numeroRapporto": {
+          "description": "Identificativo univoco del rapporto",
+          "type": "string",
+          "pattern": "^[\\w]{12}$",
+          "minLength": 12,
+          "maxLength": 12
+        }
+      }
+    },
+    "IdentificativoRapportoProvvisorio": {
+      "description": "Identificativo di un rapporto provvisorio costruito sulla base della definizione di un rapporto generico secondo lo standard Banco BPM",
+      "type": "object",
+      "properties": {
+        "codiceFiliale": {
+          "description": "Codice della filiale",
+          "type": "string",
+          "pattern": "^[0-9]{1,5}$",
+          "minLength": 1,
+          "maxLength": 5,
+          "example": 102
+        },
+        "tipologiaServizio": {
+          "description": "Codice del tipo servizio",
+          "type": "string",
+          "pattern": "^[\\w]{3}$",
+          "minLength": 3,
+          "maxLength": 3
+        },
+        "tipologiaCategoria": {
+          "description": "Indica il tipo di conto. Da questo campo sarà transcodificata la natura del rapporto.",
+          "type": "string",
+          "pattern": "^[\\w]{4}$",
+          "minLength": 4,
+          "maxLength": 4
+        },
+        "numeroRapportoProvvisorio": {
+          "description": "il codice identificativo provvisorio assegnato prima di conoscere il numero di rapporto definitivo",
+          "type": "string",
+          "pattern": "^[\\w]{12}$",
+          "minLength": 12,
+          "maxLength": 12
+        }
+      }
+    },
+    "IdentificativoOperazione": {
+      "description": "codice identificativo dell'operazione",
+      "type": "object",
+      "required": [
+        "codiceApplicazioneChiamante",
+        "codiceFiliale",
+        "codiceOperazione"
+      ],
+      "properties": {
+        "codiceApplicazioneChiamante": {
+          "description": "Codice Pegaso dell'applicazione",
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 5
+        },
+        "codiceFiliale": {
+          "description": "codice della filiale che esegue l'operazione",
+          "type": "string",
+          "pattern": "^\\d{1,5}$",
+          "example": "1",
+          "minLength": 1,
+          "maxLength": 5
+        },
+        "codiceOperazione": {
+          "description": "Chiave Identificativa Operazione nella settoriale chiamante. Ad esempio nello scenario dell’applicazione di cassa (clic) viene generato un identificativo che non è univoco per applicazione",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 50
+        }
+      }
+    },
+    "DettaglioOperazione": {
+      "description": "Dettagli usati da Gianos 3D per identificare un'operazione in assenza di un'identificativo univoco.",
+      "type": "object",
+      "properties": {
+        "identificativoOperazione": {
+          "$ref": "#/definitions/IdentificativoOperazione"
+        },
+        "naturaOperazione": {
+          "description": "Filtro usato da Gianos 3D.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30,
+          "enum": [
+            "ORDINE_DI_BONIFICO_ITALIA",
+            "ORDINE_DI_BONIFICO_ESTERO",
+            "PAGAMENTO_TRIBUTI_F23_F24",
+            "BOLLETTINI_MAV_RAV",
+            "ALTRI_BOLLETTINI_POSTALI_BANCARI",
+            "RIBA_EFFETTI_CARTACEI",
+            "CAMBIO_ASSEGNI_CIRCOLARI_BANCARI_VAGLIA_E_TITOLI_SIMILARI",
+            "RIMESSE_DI_DENARO",
+            "ACQUISTO_DIVISA_ESTERA",
+            "ACQUSTI_TRAVELLERS_CHEQUES",
+            "VERSAMENTO_TITOLI_AL_PORTATORE",
+            "VERSAMENTO_SU_CARTE_PREPAGATE",
+            "INCASSO_VINCITE",
+            "ALTRI_PAGAMENTI",
+            "VENDITA_DIVISA_ESTERA",
+            "INCASSO_TRAVELLERS_CHEQUES",
+            "PRELIEVO_TITOLI_AL_PORTATORE",
+            "PRELIEVO_SU_CARTE"
+          ]
+        },
+        "banconoteGrossoTaglio": {
+          "$ref": "#/definitions/BanconoteGrossoTaglio"
+        },
+        "importoOperazione": {
+          "description": "Filtro usato da Gianos 3D.",
+          "type": "number",
+          "minLength": 0,
+          "maxLength": 20
+        },
+        "commissioneOperazione": {
+          "description": "Filtro usato da Gianos 3D.",
+          "type": "number"
+        },
+        "provenienzaDenaro": {
+          "description": "Filtro usato da Gianos 3D.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 50
+        },
+        "datiControparte": {
+          "$ref": "#/definitions/DatiControparte"
+        }
+      }
+    },
+    "DatiControparte": {
+      "description": "dati della controparte",
+      "type": "object",
+      "properties": {
+        "paese": {
+          "description": "paese della controparte",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "provincia": {
+          "description": "provincia della controparte se il paese della controparte è Italia",
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2
+        }
+      }
+    },
+    "BanconoteGrossoTaglio": {
+      "description": "banconote di grosso taglio",
+      "type": "object",
+      "required": [
+        "numeroBanconote500",
+        "numeroBanconote200"
+      ],
+      "properties": {
+        "numeroBanconote500": {
+          "description": "Filtro usato da Gianos 3D.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 20
+        },
+        "numeroBanconote200": {
+          "description": "Filtro usato da Gianos 3D.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 20
+        }
+      }
+    },
+    "DatiTemplateQuestionario": {
+      "description": "campi necessari per identificare il template del questionario",
+      "type": "object",
+      "properties": {
+        "tipoQuestionario": {
+          "description": "Tipologia di questionario",
+          "type": "string",
+          "enum": [
+            "APERTURA_RAPPORTO",
+            "AGGIORNAMENTO_RAPPORTO",
+            "OPERAZIONE_OCCASIONALE",
+            "APPROFONDIMENTO_OPERAZIONE_SU_RAPPORTO"
+          ],
+          "example": "APERTURA_RAPPORTO"
+        },
+        "contestoChiamante": {
+          "description": "canale di acquisizione del questionario necessario per indirizzare l'adeguata verifica da definire",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30,
+          "enum": [
+            "SPORTELLO",
+            "DIGITAL",
+            "PROFAMILY",
+            "TERZI"
+          ]
+        }
+      }
+    },
+    "OggettoDelQuestionario": {
+      "description": "oggetto del questionario",
+      "type": "object",
+      "properties": {
+        "rapportiCoinvolti": {
+          "description": "identificativo univoco di un rapporto secondo lo standard di Banco BPM",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/definitions/IdentificativoRapportoGenerico"
+          }
+        },
+        "rapportiProvvisoriCoinvolti": {
+          "description": "identificativo univoco di un rapporto provvisorio costruito sulla base di un identificativo equivalente di un rapporto generico secondo lo standard di Banco BPM",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/definitions/IdentificativoRapportoProvvisorio"
+          }
+        },
+        "operazioniCoinvolte": {
+          "description": "elenco delle operazioni per cui viene inserito un questionario. Per ogni operazione nell'elenco sarà creato un questionario",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/definitions/Operazione"
+          }
+        }
+      }
+    },
+    "QuestionarioDomandeEnum": {
+      "description": "Codice identificativo della domanda su Gianos",
+      "type": "string",
+      "enum": [
+        "A-01.4_COMUNE_DI_RESIDENZA",
+        "A-01.26A_PEP",
+        "A-01.26B_COLLEGATO_PEP",
+        "A-01.26C_RELAZIONE_PEP",
+        "A-01.26D_SOGGETTO_PEP_COLLEGATO",
+        "A-01.26E_TIPOLOGIA_CARICA_RICOPERTA",
+        "A-01.26F_NAZIONE_INCARICO",
+        "A-01.26G_CITTA_INCARICO",
+        "A-01.26H_INCARICO_IN_CORSO",
+        "A-01.26I_TERMINE_INCARICO",
+        "A.02-01_OCCUPATO_PRESSO",
+        "A.02-02_PERIODO_OCCUPAZIONE",
+        "A.02-03_TIPO_ASSUNZIONE",
+        "A.02-04_SCADENZA_CONTRATTO",
+        "A.02-05_REDDITO_ANNUO",
+        "A.02-06_REDDITO_ANNUO_FAMIGLIA",
+        "A.02-07_ALTRI_REDDITI",
+        "A-04.10A_PEP",
+        "A-04.10B_COLLEGATO_PEP",
+        "A-04.10C_RELAZIONE_PEP",
+        "A-04.03A_RELAZIONI_AFFARI",
+        "A-04.03B_RELAZIONI_AFFARI2",
+        "A-02.10_SOGGETTI_CATEGORIE_PARTICOLARI",
+        "A-02.11_PARTECIPA_APPALTI_PUBBLICI",
+        "A-02.12_RICEVUTO_FINANZIAMENTI_PUBBLICI"
+      ]
+    },
+    "CreaQuestionario": {
+      "description": "Oggetto usato per la creazione di un questionario. Richiede dei dati di input obbligatori.",
+      "required": [
+        "codiceAbi",
+        "clienteCodiceNdg",
+        "template",
+        "oggetto"
+      ],
+      "type": "object",
+      "properties": {
+        "codiceAbi": {
+          "description": "codice ABI dell'istituto di riferimento",
+          "type": "string",
+          "pattern": "^\\d{5}$",
+          "example": "05034",
+          "minLength": 5,
+          "maxLength": 5
+        },
+        "codiceFilialeInserimento": {
+          "description": "Codice della Filiale di compilazione questionario",
+          "type": "string",
+          "pattern": "^\\d{1,5}$",
+          "example": "1",
+          "minLength": 1,
+          "maxLength": 5
+        },
+        "clienteCodiceNdg": {
+          "description": "Codice NDG del cliente che ha compilato il questionario. Il campo è obbligatorio perchè è il campo chiave richiesto successivamente per la ricerca dei questionari. Non è possibile creare un questionario per un soggetto non censito e quindi senza NDG. Il campo nel servizio di creazione può contenere l'NDG di cointestazione, in tal caso il servizio crea un questionario per ogni cliente partecipante alla cointestazione.",
+          "type": "string",
+          "maxLength": 11,
+          "minLength": 1,
+          "example": "1045379"
+        },
+        "template": {
+          "$ref": "#/definitions/DatiTemplateQuestionario"
+        },
+        "oggetto": {
+          "$ref": "#/definitions/OggettoDelQuestionario"
+        }
+      }
+    },
+    "QuestionarioCreato": {
+      "description": "Risposta del servizio creaQuestionario",
+      "type": "object",
+      "properties": {
+        "idQuestionario": {
+          "description": "Identificativo del questionario su Gianos",
+          "type": "integer",
+          "format": "int32"
+        },
+        "codiceNdgCliente": {
+          "description": "Codice NDG del soggetto che sta eseguendo l'operazione e ha compilato il questionario. <br>Example: '1045379'",
+          "type": "string",
+          "maxLength": 11,
+          "minLength": 1
+        }
+      }
+    },
+    "Eccezione": {
+      "description": "descrizione dell'errore",
+      "type": "object",
+      "required": [
+        "codice",
+        "messaggio",
+        "layer"
+      ],
+      "properties": {
+        "codice": {
+          "description": "identificativo del tipo di errore",
+          "type": "string",
+          "pattern": "^(?!\\\\s*$).+",
+          "example": "01",
+          "minLength": 1,
+          "maxLength": 15
+        },
+        "messaggio": {
+          "description": "descrizione del tipo di errore",
+          "pattern": "^(?!\\\\s*$).+",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "example": "Il profilo di rischio non può essere calcolato"
+        },
+        "layer": {
+          "description": "layer dell'errore",
+          "pattern": "^(?!\\\\s*$).+",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10,
+          "example": "gianos4d"
+        },
+        "dettagli": {
+          "description": "elenco di dettaglio degli errori rilevati",
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 200,
+          "items": {
+            "$ref": "#/definitions/DettagliEccezione"
+          }
+        }
+      }
+    },
+    "DettagliEccezione": {
+      "description": "elenco degli errori",
+      "type": "object",
+      "properties": {
+        "campo": {
+          "description": "Campo su cui è stato registrato l'errore",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30,
+          "example": "identificativoDomanda"
+        },
+        "domanda": {
+          "$ref": "#/definitions/QuestionarioDomandeEnum"
+        },
+        "tipoErrore": {
+          "description": "Tipologia dell'errore<br><table><tr><th>Codice</th><th>Descrizione</th></tr><tr><td>WARN</td><td>Messaggio di allerta. Potrebbe comportare comportamenti anomali o causare errori successivi.</td></tr><tr><td>ERR</td><td>Errore bloccante. L'operazione non è andata a buon fine sul campo indicato.</td></tr><tr><td>INFO</td><td>Messaggio informativo utilizzabile dal chiamante se previsto.</td></tr></table>",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 5,
+          "enum": [
+            "WARN",
+            "ERR",
+            "INFO"
+          ]
+        },
+        "codiceErrore": {
+          "description": "Codice che identifica il tipo di errore registrato",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10,
+          "example": "W01"
+        },
+        "descrizione": {
+          "description": "Descrizione estesa dell'errore",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      },
+      "example": {
+        "campo": "identificativoDomanda",
+        "domanda": "A-01.4_COMUNE_DI_RESIDENZA",
+        "tipoErrore": "WARN",
+        "codiceErrore": "W01",
+        "descrizione": "Il comune di residenza non è censito nella base dati"
+      }
+    }
+  }
+}
