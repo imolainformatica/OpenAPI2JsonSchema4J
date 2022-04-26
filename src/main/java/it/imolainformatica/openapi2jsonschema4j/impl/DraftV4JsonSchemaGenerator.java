@@ -12,19 +12,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.ser.std.NullSerializer;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.processors.syntax.SyntaxValidator;
 
-import io.swagger.models.AbstractModel;
-import io.swagger.models.ArrayModel;
-import io.swagger.models.Model;
-import io.swagger.models.ModelImpl;
-import io.swagger.models.Swagger;
-import io.swagger.models.properties.ArrayProperty;
-import io.swagger.models.properties.ObjectProperty;
-import io.swagger.models.properties.Property;
-import io.swagger.models.properties.RefProperty;
+import io.swagger.models.*;
+import io.swagger.models.properties.*;
 import it.imolainformatica.openapi2jsonschema4j.base.BaseJsonSchemaGenerator;
 import it.imolainformatica.openapi2jsonschema4j.base.IJsonSchemaGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -41,14 +35,13 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	private Map<String, JsonNode> generateForObjects() throws Exception {
 		for (String ref : getMessageObjects()) {
 			String title = ref.replace(DEFINITIONS2, "");
-			log.info("title={}", title);
 			Map<String, Object> defs = (Map<String, Object>) ((HashMap<String, Model>) getObjectsDefinitions()).clone();
 			AbstractModel ob = (AbstractModel) defs.get(title);
 			defs.remove(title);
 			Map<String, Object> res = new HashMap<String, Object>();
 			res.put(DEFINITIONS, defs);
 			res.put(TITLE2, title);
-			log.info("{}",ob);
+			log.info("Generating json schema for object '{}' of type {}", title,ob.getClass());
 			if (ob instanceof ModelImpl) {
 				res.put(TYPE, ((ModelImpl) ob).getType());
 				res.put(PROPERTIES, ob.getProperties());
@@ -75,17 +68,17 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	}
 
 	private void removeUnusedObject(Map<String, Object> res, AbstractModel ob) {
-		log.info("Rimozione definizioni non usate {}",res.get(TITLE2));
+		log.info("Removing unused definition for '{}'",res.get(TITLE2));
 		List<String> usedDefinition = new ArrayList<>();
 		navigateModel((String)res.get(TITLE2),usedDefinition,res,ob);
-		log.info("used={}",usedDefinition);
+		log.info("Used Object = {}",usedDefinition);
 		List<String> tbdeleted = new ArrayList<>();
 		for (String key : ((Map<String,Object>)res.get(DEFINITIONS)).keySet()) {
 			if (!usedDefinition.contains(key)){
-				log.debug("cancello la definizione per l'oggetto {}",key);
+				log.debug("Removing definition for object {}",key);
 				tbdeleted.add(key);
 			} else {
-				log.debug("l'oggetto {} è usato",key);
+				log.debug("Object {} is used!",key);
 			}
 		}
 		for (String del : tbdeleted){
@@ -94,15 +87,14 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	}
 
 	private void navigateModel(String originalRef, List<String> usedDefinition, Map<String, Object> res, Object ob) {
-		log.debug("navigating ref {} object={}",originalRef,ob);
+		log.debug("Analyzing ref {} object={}",originalRef,ob);
 		String objectName=originalRef.replace(DEFINITIONS2,"");
-		log.debug("definitions={}",res);
 		if (ob==null){
 			ob = ((Map) res.get(DEFINITIONS)).get(objectName);
 		}
-		log.debug("navigating object {} {}",ob,originalRef);
+		log.debug("Analyzing object {} {}",ob,originalRef);
 		if (usedDefinition.contains(objectName)){
-			log.info("{} è già stato analizzato!",objectName);
+			log.info("Found circular reference for object {}!",objectName);
 			return;
 		}
 		usedDefinition.add(objectName);
@@ -110,46 +102,55 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			ModelImpl mi = (ModelImpl)ob;
 			Map<String, Property> m = mi.getProperties();
 			log.debug("properties={}",m);
-			for (String name : m.keySet()){
-				navigateProperty(name,m.get(name),usedDefinition,res);
+			if (m!=null) {
+				for (String name : m.keySet()) {
+					navigateProperty(name, m.get(name), usedDefinition, res);
+				}
 			}
 		} else if (ob instanceof ArrayModel) {
 			log.debug("array model={}",res.get(ITEMS));
 			if (res.get(ITEMS) instanceof RefProperty) {
 				navigateModel(((RefProperty)((RefProperty)res.get(ITEMS))).getOriginalRef(),usedDefinition,res,null);
 			}
+		} else if (ob instanceof ComposedModel) {
+			ComposedModel cm = (ComposedModel)ob;
+			for (Model m : cm.getAllOf()) {
+				navigateModel(m.getReference(), usedDefinition,res,null);
+			}
+
+		}  else if (ob instanceof RefModel) {
+			RefModel rm = (RefModel)ob;
+			Map<String, Property> m = rm.getProperties();
+			log.debug("properties={}",m);
+			if (m!=null) {
+				for (String name : m.keySet()) {
+					navigateProperty(name, m.get(name), usedDefinition, res);
+				}
+			}
+
 		} else {
-			throw new RuntimeException(ob.getClass()+" non gestito");
+			throw new RuntimeException(ob.getClass()+" not handled!");
 		}
 	}
 
 	private void navigateProperty(String propertyName, Property p,List<String> usedDefinition,Map<String, Object> res){
-		log.debug("property name={} type={}",propertyName,p);
+		log.debug("property name '{}' of type {}",propertyName,p);
 		if (p instanceof RefProperty) {
 			navigateModel(((RefProperty)((RefProperty) p)).getOriginalRef(),usedDefinition,res,null);
 		} else if (p instanceof ArrayProperty) {
 			ArrayProperty ap = (ArrayProperty) p;
 			log.debug("Array property={} items={}",ap,ap.getItems());
 			navigateProperty("items",ap.getItems(),usedDefinition,res);
-			/*if (ap.getItems() instanceof RefProperty) {
-				navigateModel(((RefProperty)((RefProperty) ap.getItems())).getOriginalRef(),usedDefinition,res,null);
-			} if (ap.getItems() instanceof ObjectProperty){
-				ObjectProperty op = (ObjectProperty) ap.getItems();
-				//devo navigare tutte le properties per gli oggetti non referenziati
-				for (String name : op.getProperties().keySet()){
-					navigateProperty(name,op.getProperties().get(name),usedDefinition,res);
-				}
-			} else {
-				log.info("non gestito");
-			}*/
 		} else if (p instanceof ObjectProperty){
 			ObjectProperty op = (ObjectProperty) p;
 			for (String name : op.getProperties().keySet()){
 				navigateProperty(name,op.getProperties().get(name),usedDefinition,res);
 			}
-
+		} else if (p instanceof MapProperty) {
+			MapProperty mp = (MapProperty)p;
+			navigateProperty(mp.getName(),mp.getAdditionalProperties(),usedDefinition,res);
 		} else {
-			log.debug(p.getClass()+" - niente da fare");
+			log.debug(p.getClass() + " - nothing to do!");
 		}
 	}
 

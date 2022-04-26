@@ -128,6 +128,9 @@
         },
         "extraInfo": {
           "$ref": "#/definitions/Info"
+        },
+        "objectNoProps": {
+          "$ref": "#/definitions/Info6"
         }
       }
     },
@@ -231,12 +234,49 @@
       "properties": {
         "test2": {
           "type": "string"
+        },
+        "map": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Info7"
+          }
         }
       }
     },
     "Info5": {
       "properties": {
         "test3": {
+          "type": "string"
+        }
+      }
+    },
+    "Info6": {
+      "type": "object"
+    },
+    "Info7": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseModel"
+        }],
+      "properties": {
+        "test4": {
+          "type": "string"
+        }
+      }
+    },
+    "BaseModel": {
+      "properties": {
+        "base": {
+          "type": "string"
+        },
+        "other": {
+          "$ref": "#/definitions/Info8"
+        }
+      }
+    },
+    "Info8": {
+      "properties": {
+        "xy": {
           "type": "string"
         }
       }
