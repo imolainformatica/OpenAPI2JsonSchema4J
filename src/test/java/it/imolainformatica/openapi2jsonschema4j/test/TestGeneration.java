@@ -42,17 +42,15 @@ public class TestGeneration extends AbstractIT{
 		testForSwagger("petstore.json"); 
 	}
 
-
-
 	@Test
 	public void testPetStoreWithStrictAndDateFormatAndPattern() {
 		testForSwagger("petstoreDateFormat.json");
 	}
 	
-	/*@Test
-	public void testDefaultSwaggerYamlWithStrict() {
-		testForSwagger("APIAC_AnagrafeClientiAPI_v1.0.yaml"); 
-	}*/
+	@Test
+	public void testSwaggerWithoutBody() {
+		testForSwagger("petstoreNoBody.json");
+	}
 
 	private void testForSwagger(String swaggerFile) {
 		log.info("Test for swagger {}", swaggerFile);

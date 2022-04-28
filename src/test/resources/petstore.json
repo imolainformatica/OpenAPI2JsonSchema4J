@@ -240,6 +240,9 @@
           "additionalProperties": {
             "$ref": "#/definitions/Info7"
           }
+        },
+        "field": {
+          "$ref": "#/definitions/Info9"
         }
       }
     },
@@ -277,6 +280,13 @@
     "Info8": {
       "properties": {
         "xy": {
+          "type": "string"
+        }
+      }
+    },
+    "Info9": {
+      "properties": {
+        "zz": {
           "type": "string"
         }
       }
