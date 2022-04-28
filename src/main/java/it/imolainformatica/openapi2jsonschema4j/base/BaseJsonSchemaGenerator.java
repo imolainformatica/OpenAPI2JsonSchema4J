@@ -53,7 +53,7 @@ public class BaseJsonSchemaGenerator {
 			Path v = entry.getValue();
 			log.info(k + "=" + v);
 			for (Operation op : v.getOperations()) {
-				log.info("	{}", op.getOperationId());
+				log.info("Operation={}", op.getOperationId());
 				Optional<Parameter> body = op.getParameters().stream().filter(c -> "body".equalsIgnoreCase(c.getIn()))
 						.findFirst();
 				if (body.isPresent()) {
@@ -66,8 +66,13 @@ public class BaseJsonSchemaGenerator {
 					String rk = entry2.getKey();
 					Response r = entry2.getValue();
 					if (r.getResponseSchema() != null) {
-						messageObjects.add(r.getResponseSchema().getReference());
-						log.info("code={} responseSchema={}", rk, r.getResponseSchema().getReference());
+						if (r.getResponseSchema().getReference()!=null) {
+							messageObjects.add(r.getResponseSchema().getReference());
+							log.info("code={} responseSchema={}", rk, r.getResponseSchema().getReference());
+						} else {
+							log.warn("code={} response schema is not a referenced definition! type={}",rk,r.getResponseSchema().getClass());
+						}
+
 					}
 				}
 			}
