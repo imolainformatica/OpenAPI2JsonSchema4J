@@ -58,10 +58,7 @@ public class TestGeneration extends AbstractIT{
 
 
 	@Test
-	public void testOAS3() {
-
-		testForSwagger("petstoreoas3.json");
-	}
+	public void testOAS3() { testForSwagger("petstoreoas3.json");	}
 
 	private void testForSwagger(String swaggerFile) {
 		log.info("Test for swagger {}", swaggerFile);
@@ -80,11 +77,8 @@ public class TestGeneration extends AbstractIT{
 
 
 	private void testGeneratedJsonSchema(File f, Map<String, JsonNode> gen) throws ProcessingException, IOException {
-		//Swagger swagger = new SwaggerParser().read(f.getAbsolutePath());
 		SwaggerParseResult result = new OpenAPIParser().readLocation(f.getAbsolutePath(),null,null);
 		OpenAPI swagger = result.getOpenAPI();
-		//Swagger swagger = new SwaggerParser().read(interfaceFile.getAbsolutePath());
-		//objectsDefinitions = swagger.getComponents().getSchemas();
 
 		Map<String, Schema> definitions = swagger.getComponents().getSchemas();
 		
