@@ -8,7 +8,6 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.swagger.models.Swagger;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -31,7 +30,6 @@ public class BaseJsonSchemaGenerator {
 	protected static final String DEFINITIONS2 = "#/components/schemas/";
 	protected static final String TITLE2 = "title";
 	protected static final String ADDITIONAL_PROPERTIES = "additionalProperties";
-	//protected static final String DEFINITIONS = "definitions";
 	protected static final String MAX_ITEMS = "maxItems";
 	protected static final String MIN_ITEMS = "minItems";
 	protected static final String REQUIRED = "required";
@@ -44,54 +42,36 @@ public class BaseJsonSchemaGenerator {
 	private Map<String, Schema> objectsDefinitions = new HashMap<String, Schema>();
 
 	
-	protected Swagger readFromInterface20(File interfaceFile) {
-
+	protected void readFromInterface(File interfaceFile) {
 		SwaggerParseResult result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,null);
 		OpenAPI swagger = result.getOpenAPI();
-		//Swagger swagger = new SwaggerParser().read(interfaceFile.getAbsolutePath());
 		objectsDefinitions = swagger.getComponents().getSchemas();
 		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) {
 			String k = entry.getKey();
 			PathItem v = entry.getValue();
 			log.info(k + "=" + v);
-			for (Operation op : v.readOperations()) {
-				log.info("Operation={}", op.getOperationId());
-				findRequestBodySchema(op, messageObjects);
-				for (String key : op.getResponses().keySet()){
-					ApiResponse r = op.getResponses().get(key);
-					if (r.getContent()!=null) {
-						if (r.getContent().get(APPLICATION_JSON) != null) {
-							if (r.getContent().get(APPLICATION_JSON).getSchema().get$ref() != null) {
-								log.info("code={} responseSchema={}", key, r.getContent().get(APPLICATION_JSON).getSchema().get$ref());
-								messageObjects.add(r.getContent().get(APPLICATION_JSON).getSchema().get$ref());
-							} else {
-								log.warn("code={} response schema is not a referenced definition! type={}", key, r.getContent().get("application/json").getClass());
-							}
+			analyzeOperation(v);
+		}
+	}
+
+	private void analyzeOperation(PathItem v) {
+		for (Operation op : v.readOperations()) {
+			log.info("Operation={}", op.getOperationId());
+			findRequestBodySchema(op, messageObjects);
+			for (String key : op.getResponses().keySet()){
+				ApiResponse r = op.getResponses().get(key);
+				if (r.getContent()!=null) {
+					if (r.getContent().get(APPLICATION_JSON) != null) {
+						if (r.getContent().get(APPLICATION_JSON).getSchema().get$ref() != null) {
+							log.info("code={} responseSchema={}", key, r.getContent().get(APPLICATION_JSON).getSchema().get$ref());
+							messageObjects.add(r.getContent().get(APPLICATION_JSON).getSchema().get$ref());
+						} else {
+							log.warn("code={} response schema is not a referenced definition! type={}", key, r.getContent().get("application/json").getClass());
 						}
 					}
 				}
-
-
-
-				/*for (Map.Entry<String, ApiResponse> entry2 : op.getResponses()) {
-					String rk = entry2.getKey();
-					Response r = entry2.getValue();
-					if (r.getResponseSchema() != null) {
-						if (r.getResponseSchema().getReference()!=null) {
-							messageObjects.add(r.getResponseSchema().getReference());
-							log.info("code={} responseSchema={}", rk, r.getResponseSchema().getReference());
-						} else {
-							log.warn("code={} response schema is not a referenced definition! type={}",rk,r.getResponseSchema().getClass());
-						}
-
-					}
-				}*/
 			}
-
 		}
-
-		return null;
-
 	}
 
 	private void findRequestBodySchema(Operation op, Set<String> messageObjects) {
@@ -105,7 +85,6 @@ public class BaseJsonSchemaGenerator {
 					} else {
 						log.warn("Request schema is not a referenced definition!");
 					}
-
 				}
 			} else {
 				log.info("No application body of type 'application/json' found for operation {}",op.getOperationId());

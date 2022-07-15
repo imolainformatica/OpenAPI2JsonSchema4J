@@ -3,6 +3,7 @@ package it.imolainformatica.openapi2jsonschema4j.impl;
 import java.io.File;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import io.swagger.v3.oas.models.media.*;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -19,7 +20,6 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.processors.syntax.SyntaxValidator;
 
 import io.swagger.models.*;
-import io.swagger.models.properties.*;
 import it.imolainformatica.openapi2jsonschema4j.base.BaseJsonSchemaGenerator;
 import it.imolainformatica.openapi2jsonschema4j.base.IJsonSchemaGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +29,13 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 
 	private static final String SCHEMAS = "schemas";
 	private static final String COMPONENTS = "components";
+	private static final String EXAMPLESETFLAG = "exampleSetFlag";
+	public static final String EXAMPLE = "example";
+	public static final String XML = "xml";
+	private static final String[] ignoreProperties = {ORIGINAL_REF, EXAMPLESETFLAG,EXAMPLE,XML};
 	private boolean strict;
 
+	
 	public DraftV4JsonSchemaGenerator(boolean strict) {
 		this.strict = strict;
 	}
@@ -163,12 +168,19 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		}
 	}
 
+	@JsonFilter("myFilter")
+	public class DynamicMixIn {
+	}
+
 	private JsonNode postprocess(Map<String, Object> res) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.setSerializationInclusion(Include.NON_NULL);
-		SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept(ORIGINAL_REF);
-		FilterProvider filters = new SimpleFilterProvider().addFilter("myFilter", theFilter);
-		String json = mapper.writer(filters).writeValueAsString(res);
+		mapper.addMixIn(Object.class, DynamicMixIn.class);
+		SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept(ignoreProperties);
+		FilterProvider filters = new SimpleFilterProvider()
+				.addFilter("myFilter", theFilter);
+		mapper.setFilterProvider(filters);
+		String json = mapper.writeValueAsString(res);
 		ObjectMapper mapper2 = new ObjectMapper();
 		JsonNode jsonNode = mapper2.readValue(json, JsonNode.class);
 		process("", jsonNode);
@@ -178,6 +190,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		} else {
 			throw new Exception("Invalid json Schema");
 		}
+
+		//devo gestire i campi nullable
 	}
 
 	private void process(String prefix, JsonNode currentNode) {
@@ -225,9 +239,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 
 	@Override
 	public Map<String, JsonNode> generate(File interfaceFile) throws Exception {
-
-
-		Swagger sw = readFromInterface20(interfaceFile);
+		readFromInterface(interfaceFile);
 		Map<String, JsonNode> schemas = generateForObjects();
 		return schemas;
 
