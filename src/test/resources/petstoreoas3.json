@@ -1055,7 +1055,8 @@
           },
           "firstName": {
             "type": "string",
-            "example": "John"
+            "example": "John",
+            "nullable": true
           },
           "lastName": {
             "type": "string",
@@ -1113,7 +1114,8 @@
           },
           "name": {
             "type": "string",
-            "example": "doggie"
+            "example": "doggie",
+            "nullable": true
           },
           "category": {
             "$ref": "#/components/schemas/Category"

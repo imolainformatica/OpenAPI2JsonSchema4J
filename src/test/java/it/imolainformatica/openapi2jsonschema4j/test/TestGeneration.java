@@ -46,6 +46,7 @@ public class TestGeneration extends AbstractIT{
 		testForSwagger("petstore.json"); 
 	}
 
+
 	@Test
 	public void testPetStoreWithStrictAndDateFormatAndPattern() {
 		testForSwagger("petstoreDateFormat.json");

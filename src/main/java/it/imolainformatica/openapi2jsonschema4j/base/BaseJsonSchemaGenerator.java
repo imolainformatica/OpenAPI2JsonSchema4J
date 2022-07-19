@@ -49,7 +49,6 @@ public class BaseJsonSchemaGenerator {
 		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) {
 			String k = entry.getKey();
 			PathItem v = entry.getValue();
-			log.info(k + "=" + v);
 			analyzeOperation(v);
 		}
 	}

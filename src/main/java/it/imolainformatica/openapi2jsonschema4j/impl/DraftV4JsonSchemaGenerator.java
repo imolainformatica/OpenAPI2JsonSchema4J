@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.swagger.v3.oas.models.media.*;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -19,7 +20,6 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.processors.syntax.SyntaxValidator;
 
-import io.swagger.models.*;
 import it.imolainformatica.openapi2jsonschema4j.base.BaseJsonSchemaGenerator;
 import it.imolainformatica.openapi2jsonschema4j.base.IJsonSchemaGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,25 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	private static final String EXAMPLESETFLAG = "exampleSetFlag";
 	public static final String EXAMPLE = "example";
 	public static final String XML = "xml";
-	private static final String[] ignoreProperties = {ORIGINAL_REF, EXAMPLESETFLAG,EXAMPLE,XML};
+	public static final String EXTENSIONS = "extensions";
+	private static final String NULLABLE = "nullable";
+	private static final String DISCRIMINATOR = "discriminator";
+	private static final String READONLY = "readOnly";
+	private static final String WRITEONLY = "writeOnly";
+	private static final String EXTERNALDOCS = "externalDocs";
+	private static final String DEPRECATED = "deprecated";
+	private static final String[] ignoreProperties = {ORIGINAL_REF,
+			EXAMPLESETFLAG,
+			EXAMPLE,
+			XML,
+			EXTENSIONS,
+			NULLABLE,
+			DISCRIMINATOR,
+			READONLY,
+			WRITEONLY,
+			EXTERNALDOCS,
+			DEPRECATED};
+	public static final String NULL = "null";
 	private boolean strict;
 
 	
@@ -125,26 +143,23 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			}
 		} else if (ob instanceof ComposedSchema) {
 			ComposedSchema cm = (ComposedSchema)ob;
-			for (Schema m : cm.getAllOf()) {
-				navigateModel(m.get$ref(), usedDefinition,res,null);
+			lookComposedModel(cm.getAllOf(),usedDefinition,res);
+			lookComposedModel(cm.getAnyOf(),usedDefinition,res);
+			lookComposedModel(cm.getOneOf(),usedDefinition,res);
+			if (cm.getNot()!=null) {
+				navigateModel(cm.getNot().get$ref(), usedDefinition, res, null);
 			}
-
-		} /* else if (ob instanceof RefModel) {
-			RefModel rm = (RefModel)ob;
-			Map<String, Property> m = rm.getProperties();
-			log.debug("properties={}",m);
-			if (m!=null) {
-				for (String name : m.keySet()) {
-					navigateProperty(name, m.get(name), usedDefinition, res);
-				}
-			}
-
-		} */else {
-			throw new RuntimeException(ob.getClass()+" not handled!");
-		}
+		} 
 	}
 
-	private void navigateProperty(String propertyName, Schema p, List<String> usedDefinition, Map<String, Object> res){
+	private void lookComposedModel(List<Schema> schema, List<String> usedDefinition, Map<String, Object> res) {
+		if (schema!=null)
+			for (Schema m : schema) {
+				navigateModel(m.get$ref(), usedDefinition,res,null);
+			}
+	}
+
+	private void navigateSchema(String propertyName, Schema p, List<String> usedDefinition, Map<String, Object> res){
 		log.debug("property name '{}' of type {}",propertyName,p);
 		if (p.getClass() == Schema.class) {
 			navigateModel(p.get$ref(),usedDefinition,res,null);
@@ -173,6 +188,9 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	}
 
 	private JsonNode postprocess(Map<String, Object> res) throws Exception {
+		//devo gestire i valori nullable potenzialmente presenti su oas 3.0
+		res = handleNullableFields(res);
+
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		mapper.addMixIn(Object.class, DynamicMixIn.class);
@@ -183,6 +201,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		String json = mapper.writeValueAsString(res);
 		ObjectMapper mapper2 = new ObjectMapper();
 		JsonNode jsonNode = mapper2.readValue(json, JsonNode.class);
+
+
 		process("", jsonNode);
 		if (isValidJsonSchemaSyntax(jsonNode)) {
 			log.info("Valid json schema");
@@ -190,8 +210,13 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		} else {
 			throw new Exception("Invalid json Schema");
 		}
+	}
 
-		//devo gestire i campi nullable
+	private Map<String, Object> handleNullableFields(Map<String, Object> result) {
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> res = mapper.convertValue(result, new TypeReference<Map<String, Object>>(){});
+		getAllKeys(res);
+		return res;
 	}
 
 	private void process(String prefix, JsonNode currentNode) {
@@ -242,7 +267,37 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		readFromInterface(interfaceFile);
 		Map<String, JsonNode> schemas = generateForObjects();
 		return schemas;
+	}
 
+	private void getAllKeys(Map<String, Object> jsonElements) {
+		Boolean nullable = false;
+
+		for (Map.Entry entry : jsonElements.entrySet()) {
+			log.debug("entry {}",entry.getKey());
+			if (entry.getKey().equals("nullable")){
+				if (entry.getValue() instanceof Boolean) {
+					if (((Boolean)entry.getValue())==Boolean.TRUE){
+						nullable = true;
+					}
+				}
+			}
+			if (entry.getValue() instanceof Map) {
+				Map<String, Object> map = (Map<String, Object>) entry.getValue();
+				getAllKeys(map);
+			} else if (entry.getValue() instanceof List) {
+				List<?> list = (List<?>) entry.getValue();
+				list.forEach(listEntry -> {
+					if (listEntry instanceof Map) {
+						Map<String, Object> map = (Map<String, Object>) listEntry;
+						getAllKeys(map);
+					}
+				});
+			}
+		}
+		if (nullable) {
+			String actualType = (String) jsonElements.get(TYPE);
+			jsonElements.put(TYPE, new String[]{actualType, NULL});
+		}
 	}
 
 
