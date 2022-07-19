@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.swagger.v3.oas.models.media.*;
 
@@ -132,7 +133,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			log.debug("properties={}",m);
 			if (m!=null) {
 				for (String name : m.keySet()) {
-					navigateProperty(name, (Schema) m.get(name), usedDefinition, res);
+					navigateSchema(name, (Schema) m.get(name), usedDefinition, res);
 				}
 			}
 		} else if (ob instanceof ArraySchema) {
@@ -149,7 +150,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			if (cm.getNot()!=null) {
 				navigateModel(cm.getNot().get$ref(), usedDefinition, res, null);
 			}
-		} 
+		}
 	}
 
 	private void lookComposedModel(List<Schema> schema, List<String> usedDefinition, Map<String, Object> res) {
@@ -166,17 +167,17 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		} else if (p instanceof ArraySchema) {
 			ArraySchema ap = (ArraySchema) p;
 			log.debug("Array property={} items={}",ap,ap.getItems());
-			navigateProperty("items",ap.getItems(),usedDefinition,res);
+			navigateSchema("items",ap.getItems(),usedDefinition,res);
 		} else if (p instanceof ObjectSchema){
 			ObjectSchema op = (ObjectSchema) p;
 			for (String name : op.getProperties().keySet()){
-				navigateProperty(name,op.getProperties().get(name),usedDefinition,res);
+				navigateSchema(name,op.getProperties().get(name),usedDefinition,res);
 			}
 		} else if (p instanceof MapSchema) {
 			MapSchema mp = (MapSchema)p;
 			log.debug("additionalProperties={}",mp.getAdditionalProperties());
 			if (mp.getAdditionalProperties() instanceof Schema) {
-				navigateProperty(mp.getName(), (Schema)mp.getAdditionalProperties(), usedDefinition, res);
+				navigateSchema(mp.getName(), (Schema)mp.getAdditionalProperties(), usedDefinition, res);
 			}
 		} else {
 			log.debug(p.getClass() + " - nothing to do!");
@@ -190,7 +191,17 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	private JsonNode postprocess(Map<String, Object> res) throws Exception {
 		//devo gestire i valori nullable potenzialmente presenti su oas 3.0
 		res = handleNullableFields(res);
+		JsonNode jsonNode = removeNonJsonSchemaProperties(res);
+		process("", jsonNode);
+		if (isValidJsonSchemaSyntax(jsonNode)) {
+			log.info("Valid json schema");
+			return jsonNode;
+		} else {
+			throw new Exception("Invalid json Schema");
+		}
+	}
 
+	private JsonNode removeNonJsonSchemaProperties(Map<String, Object> res) throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		mapper.addMixIn(Object.class, DynamicMixIn.class);
@@ -201,15 +212,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		String json = mapper.writeValueAsString(res);
 		ObjectMapper mapper2 = new ObjectMapper();
 		JsonNode jsonNode = mapper2.readValue(json, JsonNode.class);
-
-
-		process("", jsonNode);
-		if (isValidJsonSchemaSyntax(jsonNode)) {
-			log.info("Valid json schema");
-			return jsonNode;
-		} else {
-			throw new Exception("Invalid json Schema");
-		}
+		return jsonNode;
 	}
 
 	private Map<String, Object> handleNullableFields(Map<String, Object> result) {
