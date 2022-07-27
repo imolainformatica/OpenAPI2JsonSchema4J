@@ -180,7 +180,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		} else if (p instanceof MapSchema) {
 			MapSchema mp = (MapSchema)p;
 			log.debug("additionalProperties={}",mp.getAdditionalProperties());
-			if (mp.getAdditionalProperties() instanceof Schema) {
+			if (mp.getAdditionalProperties() instanceof Schema && mp.getName()!=null) {
 				navigateSchema(mp.getName(), (Schema)mp.getAdditionalProperties(), usedDefinition, res);
 			}
 		} else {
