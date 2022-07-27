@@ -6,6 +6,7 @@ import java.util.*;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.datatype.jsr310.*;
 import io.swagger.v3.oas.models.media.*;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -51,6 +52,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			WRITEONLY,
 			EXTERNALDOCS,
 			DEPRECATED};
+	private static final List<String> ignorePropertiesList = Arrays.asList(ignoreProperties);
 	public static final String NULL = "null";
 	private boolean strict;
 
@@ -150,6 +152,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			if (cm.getNot()!=null) {
 				navigateModel(cm.getNot().get$ref(), usedDefinition, res, null);
 			}
+		} else if (ob instanceof Schema && ((Schema)ob).get$ref()!=null){
+			navigateModel(((Schema)ob).get$ref(),usedDefinition,res,null);
 		}
 	}
 
@@ -202,21 +206,45 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	}
 
 	private JsonNode removeNonJsonSchemaProperties(Map<String, Object> res) throws JsonProcessingException {
+		
+		iterateMap(res,null);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.setSerializationInclusion(Include.NON_NULL);
-		mapper.addMixIn(Object.class, DynamicMixIn.class);
-		SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept(ignoreProperties);
-		FilterProvider filters = new SimpleFilterProvider()
-				.addFilter("myFilter", theFilter);
-		mapper.setFilterProvider(filters);
 		String json = mapper.writeValueAsString(res);
 		ObjectMapper mapper2 = new ObjectMapper();
 		JsonNode jsonNode = mapper2.readValue(json, JsonNode.class);
 		return jsonNode;
 	}
+	
+	//rimuove tutte le properties di oas3 non gestite in json schema
+	private void iterateMap(Map<String, Object> res, String father) {
+		if (res==null)
+			return;
+		for (String k : res.keySet()) {
+			if (res.get(k)!=null) {
+				log.debug("key={}",k);
+				if (!"properties".equals(father)) {
+					//devo rimuovere i valori da ignorare (solo se il padre non è un campo 'properties'
+					if (ignorePropertiesList.contains(k)) {
+						log.debug("annullo la chiave {}",k);
+						res.put(k, null);
+					}
+				}
+				//altrimenti non faccio nulla
+				if (res.get(k) instanceof Map) {
+					iterateMap((Map<String, Object>) res.get(k), k);
+				}
+			}
+		}
+		
+	}
+	
+	
+	
 
 	private Map<String, Object> handleNullableFields(Map<String, Object> result) {
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new JavaTimeModule());
 		Map<String, Object> res = mapper.convertValue(result, new TypeReference<Map<String, Object>>(){});
 		getAllKeys(res);
 		return res;
@@ -238,12 +266,17 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			if (currentNode.get(TYPE) != null) {
 				String type = currentNode.get(TYPE).asText();
 				if ("object".equals(type)) {
-
 					if (on.get(ADDITIONAL_PROPERTIES)!=null) {
 						log.debug("already defined additionalProperties with value {}",on.get(ADDITIONAL_PROPERTIES).asText());
 					} else {
-						on.set(ADDITIONAL_PROPERTIES, BooleanNode.valueOf(!this.strict));
-						log.debug("setting additional properties with value {}", !this.strict);
+						if (currentNode.get(PROPERTIES)!=null && currentNode.get(PROPERTIES).isEmpty()) {
+							//devo settare additionalProperties a true come di default se l'oggetto non specifica nessuna property
+							on.set(ADDITIONAL_PROPERTIES, BooleanNode.valueOf(true));
+							log.debug("setting additional properties with value {} as this object has empty properties", true);
+						} else {						
+							on.set(ADDITIONAL_PROPERTIES, BooleanNode.valueOf(!this.strict));
+							log.debug("setting additional properties with value {}", !this.strict);
+						}
 					}
 				}
 			}

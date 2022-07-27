@@ -14,7 +14,9 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
+import org.apache.commons.lang.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,8 +45,11 @@ public class BaseJsonSchemaGenerator {
 
 	
 	protected void readFromInterface(File interfaceFile) {
-		SwaggerParseResult result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,null);
+		ParseOptions po = new ParseOptions();
+		po.setResolve(true);
+		SwaggerParseResult result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,po);
 		OpenAPI swagger = result.getOpenAPI();
+		Validate.notNull(swagger,"Error during parsing of interface file "+interfaceFile.getAbsolutePath());
 		objectsDefinitions = swagger.getComponents().getSchemas();
 		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) {
 			String k = entry.getKey();
