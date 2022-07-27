@@ -167,7 +167,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	private void navigateSchema(String propertyName, Schema p, List<String> usedDefinition, Map<String, Object> res){
 		log.debug("property name '{}' of type {}",propertyName,p);
 		if (p.getClass() == Schema.class) {
-			navigateModel(p.get$ref(),usedDefinition,res,null);
+			if (p.get$ref()!=null)
+				navigateModel(p.get$ref(),usedDefinition,res,null);
 		} else if (p instanceof ArraySchema) {
 			ArraySchema ap = (ArraySchema) p;
 			log.debug("Array property={} items={}",ap,ap.getItems());
@@ -180,7 +181,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		} else if (p instanceof MapSchema) {
 			MapSchema mp = (MapSchema)p;
 			log.debug("additionalProperties={}",mp.getAdditionalProperties());
-			if (mp.getAdditionalProperties() instanceof Schema && mp.getName()!=null) {
+			if (mp.getAdditionalProperties() instanceof Schema ) {
 				navigateSchema(mp.getName(), (Schema)mp.getAdditionalProperties(), usedDefinition, res);
 			}
 		} else {
