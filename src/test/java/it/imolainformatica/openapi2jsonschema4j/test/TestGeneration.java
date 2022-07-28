@@ -7,6 +7,14 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 
+import io.swagger.oas.inflector.examples.*;
+import io.swagger.oas.inflector.examples.models.*;
+import io.swagger.oas.inflector.processors.*;
+import io.swagger.parser.OpenAPIParser;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.parser.core.models.ParseOptions;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -19,9 +27,6 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
-import io.swagger.inflector.examples.ExampleBuilder;
-import io.swagger.inflector.examples.models.Example;
-import io.swagger.inflector.processors.JsonNodeExampleSerializer;
 import io.swagger.models.Model;
 import io.swagger.models.Swagger;
 import io.swagger.parser.SwaggerParser;
@@ -42,6 +47,7 @@ public class TestGeneration extends AbstractIT{
 		testForSwagger("petstore.json"); 
 	}
 
+
 	@Test
 	public void testPetStoreWithStrictAndDateFormatAndPattern() {
 		testForSwagger("petstoreDateFormat.json");
@@ -51,6 +57,14 @@ public class TestGeneration extends AbstractIT{
 	public void testSwaggerWithoutBody() {
 		testForSwagger("petstoreNoBody.json");
 	}
+
+
+	@Test
+	public void testOAS3() { testForSwagger("petstoreoas3.json");	}
+	
+	
+	@Test
+	public void testOAS3WithRemoteReferences() { testForSwagger("petstoreoas3-remoteref.json");	}
 
 	private void testForSwagger(String swaggerFile) {
 		log.info("Test for swagger {}", swaggerFile);
@@ -69,15 +83,19 @@ public class TestGeneration extends AbstractIT{
 
 
 	private void testGeneratedJsonSchema(File f, Map<String, JsonNode> gen) throws ProcessingException, IOException {
-		Swagger swagger = new SwaggerParser().read(f.getAbsolutePath());
-		Map<String, Model> definitions = swagger.getDefinitions();
+		ParseOptions parseOptions = new ParseOptions();
+		parseOptions.setResolve(true); // implicit
+		SwaggerParseResult result = new OpenAPIParser().readLocation(f.getAbsolutePath(),null,parseOptions);
+		OpenAPI swagger = result.getOpenAPI();
+
+		Map<String, Schema> definitions = swagger.getComponents().getSchemas();
 		
 		for (Map.Entry<String, JsonNode> entry : gen.entrySet()) {
 			String objName = entry.getKey();
 			JsonNode jsonSchemaNode = entry.getValue();
-			Model model = definitions.get(objName);
+			Schema model = definitions.get(objName);
 			log.info("Generating object example for model {}",objName);
-			Example example = ExampleBuilder.fromModel(objName, model, definitions, new HashSet<String>());
+			Example example = ExampleBuilder.fromSchema(model, definitions);
 			SimpleModule simpleModule = new SimpleModule().addSerializer(new JsonNodeExampleSerializer());
 			Json.mapper().registerModule(simpleModule);
 			String jsonExample = Json.pretty(example);
