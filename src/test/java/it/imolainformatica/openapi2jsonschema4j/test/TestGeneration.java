@@ -13,6 +13,7 @@ import io.swagger.oas.inflector.processors.*;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import org.junit.Test;
 
@@ -60,6 +61,10 @@ public class TestGeneration extends AbstractIT{
 
 	@Test
 	public void testOAS3() { testForSwagger("petstoreoas3.json");	}
+	
+	
+	@Test
+	public void testOAS3WithRemoteReferences() { testForSwagger("petstoreoas3-remoteref.json");	}
 
 	private void testForSwagger(String swaggerFile) {
 		log.info("Test for swagger {}", swaggerFile);
@@ -78,7 +83,9 @@ public class TestGeneration extends AbstractIT{
 
 
 	private void testGeneratedJsonSchema(File f, Map<String, JsonNode> gen) throws ProcessingException, IOException {
-		SwaggerParseResult result = new OpenAPIParser().readLocation(f.getAbsolutePath(),null,null);
+		ParseOptions parseOptions = new ParseOptions();
+		parseOptions.setResolve(true); // implicit
+		SwaggerParseResult result = new OpenAPIParser().readLocation(f.getAbsolutePath(),null,parseOptions);
 		OpenAPI swagger = result.getOpenAPI();
 
 		Map<String, Schema> definitions = swagger.getComponents().getSchemas();

@@ -58,17 +58,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Pet"
+                "$ref": "remotedefinitions.json#/components/schemas/Pet"
               }
             },
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/Pet"
+                "$ref": "remotedefinitions.json#/components/schemas/Pet"
               }
             },
             "application/x-www-form-urlencoded": {
               "schema": {
-                "$ref": "#/components/schemas/Pet"
+                "$ref": "remotedefinitions.json#/components/schemas/Pet"
               }
             }
           },
@@ -80,12 +80,12 @@
             "content": {
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
+                  "$ref": "remotedefinitions.json#/components/schemas/Pet"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
+                  "$ref": "remotedefinitions.json#/components/schemas/Pet"
                 }
               }
             }
@@ -121,17 +121,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Pet"
+                "$ref": "remotedefinitions.json#/components/schemas/Pet"
               }
             },
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/Pet"
+                "$ref": "remotedefinitions.json#/components/schemas/Pet"
               }
             },
             "application/x-www-form-urlencoded": {
               "schema": {
-                "$ref": "#/components/schemas/Pet"
+                "$ref": "remotedefinitions.json#/components/schemas/Pet"
               }
             }
           },
@@ -143,12 +143,12 @@
             "content": {
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
+                  "$ref": "remotedefinitions.json#/components/schemas/Pet"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
+                  "$ref": "remotedefinitions.json#/components/schemas/Pet"
                 }
               }
             }
@@ -201,7 +201,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Pet"
+                    "$ref": "remotedefinitions.json#/components/schemas/Pet"
                   }
                 }
               },
@@ -209,7 +209,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Pet"
+                    "$ref": "remotedefinitions.json#/components/schemas/Pet"
                   }
                 }
               }
@@ -260,7 +260,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Pet"
+                    "$ref": "remotedefinitions.json#/components/schemas/Pet"
                   }
                 }
               },
@@ -268,7 +268,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Pet"
+                    "$ref": "remotedefinitions.json#/components/schemas/Pet"
                   }
                 }
               }
@@ -314,12 +314,12 @@
             "content": {
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
+                  "$ref": "remotedefinitions.json#/components/schemas/Pet"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
+                  "$ref": "remotedefinitions.json#/components/schemas/Pet"
                 }
               }
             }
@@ -480,7 +480,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
+                  "$ref": "remotedefinitions.json#/components/schemas/ApiResponse"
                 }
               }
             }
@@ -539,17 +539,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Order"
+                "$ref": "remotedefinitions.json#/components/schemas/Order"
               }
             },
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/Order"
+                "$ref": "remotedefinitions.json#/components/schemas/Order"
               }
             },
             "application/x-www-form-urlencoded": {
               "schema": {
-                "$ref": "#/components/schemas/Order"
+                "$ref": "remotedefinitions.json#/components/schemas/Order"
               }
             }
           }
@@ -560,7 +560,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Order"
+                  "$ref": "remotedefinitions.json#/components/schemas/Order"
                 }
               }
             }
@@ -597,12 +597,12 @@
             "content": {
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/Order"
+                  "$ref": "remotedefinitions.json#/components/schemas/Order"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Order"
+                  "$ref": "remotedefinitions.json#/components/schemas/Order"
                 }
               }
             }
@@ -657,17 +657,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "remotedefinitions.json#/components/schemas/User"
               }
             },
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "remotedefinitions.json#/components/schemas/User"
               }
             },
             "application/x-www-form-urlencoded": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "remotedefinitions.json#/components/schemas/User"
               }
             }
           }
@@ -678,12 +678,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "remotedefinitions.json#/components/schemas/User"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "remotedefinitions.json#/components/schemas/User"
                 }
               }
             }
@@ -705,7 +705,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "remotedefinitions.json#/components/schemas/User"
                 }
               }
             }
@@ -717,12 +717,12 @@
             "content": {
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "remotedefinitions.json#/components/schemas/User"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "remotedefinitions.json#/components/schemas/User"
                 }
               }
             }
@@ -840,12 +840,12 @@
             "content": {
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "remotedefinitions.json#/components/schemas/User"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "remotedefinitions.json#/components/schemas/User"
                 }
               }
             }
@@ -881,17 +881,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "remotedefinitions.json#/components/schemas/User"
               }
             },
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "remotedefinitions.json#/components/schemas/User"
               }
             },
             "application/x-www-form-urlencoded": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "remotedefinitions.json#/components/schemas/User"
               }
             }
           }
@@ -931,234 +931,8 @@
       }
     }
   },
-  "components": {
-    "schemas": {
-      "Order": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "example": 10
-          },
-          "petId": {
-            "type": "integer",
-            "format": "int64",
-            "example": 198772
-          },
-          "quantity": {
-            "type": "integer",
-            "format": "int32",
-            "example": 7
-          },
-          "shipDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "status": {
-            "type": "string",
-            "description": "Order Status",
-            "example": "approved",
-            "enum": [
-              "placed",
-              "approved",
-              "delivered"
-            ]
-          },
-          "complete": {
-            "type": "boolean"
-          }
-        },
-        "xml": {
-          "name": "order"
-        }
-      },
-      "Customer": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "example": 100000
-          },
-          "username": {
-            "type": "string",
-            "example": "fehguy"
-          },
-          "address": {
-            "type": "array",
-            "xml": {
-              "name": "addresses",
-              "wrapped": true
-            },
-            "items": {
-              "$ref": "#/components/schemas/Address"
-            }
-          }
-        },
-        "xml": {
-          "name": "customer"
-        }
-      },
-      "Address": {
-        "type": "object",
-        "properties": {
-          "street": {
-            "type": "string",
-            "example": "437 Lytton"
-          },
-          "city": {
-            "type": "string",
-            "example": "Palo Alto"
-          },
-          "state": {
-            "type": "string",
-            "example": "CA"
-          },
-          "zip": {
-            "type": "string",
-            "example": "94301"
-          }
-        },
-        "xml": {
-          "name": "address"
-        }
-      },
-      "Category": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "example": "Dogs"
-          }
-        },
-        "xml": {
-          "name": "category"
-        }
-      },
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "example": 10
-          },
-          "username": {
-            "type": "string",
-            "example": "theUser"
-          },
-          "firstName": {
-            "type": "string",
-            "example": "John",
-            "nullable": true
-          },
-          "lastName": {
-            "type": "string",
-            "example": "James"
-          },
-          "email": {
-            "type": "string",
-            "example": "john@email.com"
-          },
-          "password": {
-            "type": "string",
-            "example": "12345"
-          },
-          "phone": {
-            "type": "string",
-            "example": "12345"
-          },
-          "userStatus": {
-            "type": "integer",
-            "description": "User Status",
-            "format": "int32",
-            "example": 1
-          }
-        },
-        "xml": {
-          "name": "user"
-        }
-      },
-      "Pet": {
-        "required": [
-          "name",
-          "photoUrls"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "example": 10
-          },
-          "name": {
-            "type": "string",
-            "example": "doggie",
-            "nullable": true
-          },
-          "category": {
-            "$ref": "#/components/schemas/Category"
-          },
-          "photoUrls": {
-            "type": "array",
-            "xml": {
-              "wrapped": true
-            },
-            "items": {
-              "type": "string",
-              "xml": {
-                "name": "photoUrl"
-              }
-            }
-          },
-          "tags": {
-            "type": "array",
-            "xml": {
-              "wrapped": true
-            },
-            "items": {
-              "$ref": "https://petstore3.swagger.io/api/v3/openapi.json#/components/schemas/Tag"
-            }
-          },
-          "status": {
-            "type": "string",
-            "description": "pet status in the store",
-            "enum": [
-              "available",
-              "pending",
-              "sold"
-            ]
-          }
-        },
-        "xml": {
-          "name": "pet"
-        }
-      },
-      "ApiResponse": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "type": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "xml": {
-          "name": "##default"
-        }
-      }
-    },
+  "components":{
+	  "schemas":{},
     "requestBodies": {
       "Pet": {
         "description": "Pet object that needs to be added to the store",

@@ -14,8 +14,6 @@ Maven plugin that converts swagger 2.0/OAS 3.0.x schema objects into self contai
 
 - Each operation MUST have a non-empty OperationID field
 - Each operation MUST not declare inline request/response body but always reference to Object Schema (no error is thrown, only a warn log)
-- REF?
-
 
 
 
@@ -24,8 +22,7 @@ Maven plugin that converts swagger 2.0/OAS 3.0.x schema objects into self contai
 
 * OAS `nullable` field adds `"null"` to `type` array if `nullable` is `true`
 * OAS specific properties are deleted from JsonSchema output (discriminator, deprecated, xml, example,...)
-* ref?
-* format ?
+* format attributes are maintened as-is
 
 
 
