@@ -90,6 +90,12 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 				res.put(MIN_ITEMS, ((ArraySchema) ob).getMinItems());
 				res.put(MAX_ITEMS, ((ArraySchema) ob).getMaxItems());
 			}
+			if (ob instanceof MapSchema) {
+				res.put(PROPERTIES, ((MapSchema) ob).getProperties());
+				res.put(TYPE, ((MapSchema) ob).getType());
+				res.put(REQUIRED,ob.getRequired());
+				res.put(ADDITIONAL_PROPERTIES,((MapSchema) ob).getAdditionalProperties());
+			}
 			res.put($SCHEMA, HTTP_JSON_SCHEMA_ORG_DRAFT_04_SCHEMA);
 			removeUnusedObject(res,ob);
 			getGeneratedObjects().put(title, postprocess(res));
@@ -152,7 +158,20 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			if (cm.getNot()!=null) {
 				navigateModel(cm.getNot().get$ref(), usedDefinition, res, null);
 			}
-		} else if (ob instanceof Schema && ((Schema)ob).get$ref()!=null){
+		} else if  (ob instanceof MapSchema) {
+			MapSchema ms = (MapSchema)ob;
+			Map<String, Schema> m = ms.getProperties();
+			log.debug("map schema properties={}",m);
+			if (m!=null) {
+				for (String name : m.keySet()) {
+					navigateSchema(name, (Schema) m.get(name), usedDefinition, res);
+				}
+			}
+			if (ms.getAdditionalProperties() instanceof Schema) {
+				navigateSchema("", (Schema)ms.getAdditionalProperties(), usedDefinition, res);
+			}
+		
+	    } else if (ob instanceof Schema && ((Schema)ob).get$ref()!=null){
 			navigateModel(((Schema)ob).get$ref(),usedDefinition,res,null);
 		}
 	}

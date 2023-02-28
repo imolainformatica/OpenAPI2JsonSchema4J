@@ -1,0 +1,77 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "TestAdditionalProperties",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "/Api"
+    }
+  ],
+  "paths": {
+    "/problem": {
+      "get": {
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DettaglioProblema"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DettaglioProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DettaglioProblema": {
+        "type": "object",
+  	   "required":["titolo","dettaglio"],
+        "properties": {
+          "titolo": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipo": {
+            "type": "string",
+            "nullable": true
+          },
+          "dettaglio": {
+        	  "$ref": "#/components/schemas/Informazione"
+          }
+        },
+        "additionalProperties": {"type":"string"}
+      },
+      "Informazione":{
+    	  "type": "object",
+    	  "required":["infoAggiuntive"],
+    	  "properties": {
+              "infoAggiuntive": {
+                "type": "string",
+                "nullable": true
+              }
+    	  },
+    	  "additionalProperties": {"$ref": "#/components/schemas/ComplexMapObject"}
+      },
+      "ComplexMapObject":{
+    	  "type": "object",
+    	  "required":["campo1"],
+    	  "properties": {
+              "campo1": {
+                "type": "string"
+              }
+    	  }
+      }
+    }
+  }
+}
