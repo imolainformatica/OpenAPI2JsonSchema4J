@@ -16,14 +16,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up JDK 8
+    - name: Set up JDK 11
       uses: actions/setup-java@v3
       with:
-        java-version: '8'
+        java-version: '11'
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package sonar:sonar -Dsonar.host.url=${{ secrets.SONARQUBE_HOST }} -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }} --file pom.xml
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v1
       if: always()
@@ -50,12 +50,3 @@ jobs:
       with:
         name: jacoco-report
         path: target/site/jacoco/
-        
-    - name: SonarQube Scan
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn sonar:sonar -Dsonar.host.url=${{ secrets.SONARQUBE_HOST }} -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }} --file pom.xml
