@@ -2,7 +2,7 @@
 
 Maven plugin that converts swagger 2.0/OAS 3.0.x schema objects into self contained json schema DRAFT_4 files for every request or response.
 
-[![Java CI with Maven](https://github.com/imolainformatica/OpenAPI2JsonSchema4J/actions/workflows/maven.yml/badge.svg?branch=develop)](https://github.com/imolainformatica/OpenAPI2JsonSchema4J/actions/workflows/maven.yml)[![Maven Central](https://maven-badges.herokuapp.com/maven-central/it.imolinfo.maven.plugins/openapi2jsonschema4j/badge.png?style=flat)](https://maven-badges.herokuapp.com/maven-central/it.imolinfo.maven.plugins/openapi2jsonschema4j)
+[![Java CI with Maven](https://github.com/imolainformatica/OpenAPI2JsonSchema4J/actions/workflows/maven.yml/badge.svg?branch=develop)](https://github.com/imolainformatica/OpenAPI2JsonSchema4J/actions/workflows/maven.yml)[![Maven Central](https://maven-badges.herokuapp.com/maven-central/it.imolinfo.maven.plugins/openapi2jsonschema4j/badge.png?style=flat)](https://maven-badges.herokuapp.com/maven-central/it.imolinfo.maven.plugins/openapi2jsonschema4j)![Coverage](.github/badges/jacoco.svg)
 
 
 
