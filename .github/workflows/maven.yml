@@ -50,8 +50,12 @@ jobs:
       with:
         name: jacoco-report
         path: target/site/jacoco/
+        
     - name: SonarQube Scan
-      uses: kitabisa/sonarqube-action@master
+      uses: actions/setup-java@v3
       with:
-        host: ${{ secrets.SONARQUBE_HOST }}
-        login: ${{ secrets.SONARQUBE_TOKEN }}
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn sonar:sonar -Dsonar.host.url=${{ secrets.SONARQUBE_HOST }} -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }} --file pom.xml
