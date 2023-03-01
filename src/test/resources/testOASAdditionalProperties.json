@@ -70,6 +70,29 @@
               "campo1": {
                 "type": "string"
               }
+    	  },
+    	  "additionalProperties": {
+    		  "type": "object",
+    		  "properties": {
+    			  "campox": {
+    				  "$ref": "#/components/schemas/ComplexMapObject2"
+    			  },
+    			  "campoy":{
+    				  "type": "array",
+    				  "items":{
+    					  "$ref": "#/components/schemas/ComplexMapObject2"
+    				  }
+    			  }
+    		  }
+    	  }
+      },
+      "ComplexMapObject2":{
+    	  "type": "object",
+    	  "required":["campo2"],
+    	  "properties": {
+              "campo2": {
+                "type": "string"
+              }
     	  }
       }
     }
