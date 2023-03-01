@@ -14,6 +14,9 @@ public class TestGenerationFromOAS3 extends AbstractIT {
 
     @Test
     public void testOAS3WithAdditionalProperties() { testForSwagger("testOASAdditionalProperties.json");	}
+    
+    @Test
+    public void testOAS3WithAdditionalPropertiesFalse() { testForSwagger("testOASAdditionalPropertiesFalse.json");	}
 
 
 }
