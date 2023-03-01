@@ -47,24 +47,24 @@ Maven plugin that converts swagger 2.0/OAS 3.0.x schema objects into self contai
 
 ```xml
 <plugin>
-						<groupId>it.imolinfo.maven.plugins</groupId>
-						<artifactId>openapi2jsonschema4j</artifactId>
-						<version>1.0.3</version>
-						<configuration>
-							<strict>true</strict>
-						</configuration>
-						<executions>
-							<execution>
-								<id>exec-id</id>
-								<phase>generate-sources</phase>
-								<configuration> 
-									<outputDirectory>${basedir}/target/json-schema</outputDirectory>
-									<interfaceFile>${basedir}/path/to/swagger.json</interfaceFile>
-								</configuration>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
+	<groupId>it.imolinfo.maven.plugins</groupId>
+	<artifactId>openapi2jsonschema4j</artifactId>
+	<version>1.0.3</version>
+	<configuration>
+		<strict>true</strict>
+	</configuration>
+	<executions>
+		<execution>
+			<id>exec-id</id>
+			<phase>generate-sources</phase>
+			<configuration> 
+				<outputDirectory>${basedir}/target/json-schema</outputDirectory>
+				<interfaceFile>${basedir}/path/to/swagger.json</interfaceFile>
+			</configuration>
+			<goals>
+				<goal>generate</goal>
+			</goals>
+		</execution>
+	</executions>
+</plugin>
 ```
