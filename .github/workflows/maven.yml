@@ -50,3 +50,8 @@ jobs:
       with:
         name: jacoco-report
         path: target/site/jacoco/
+    - name: SonarQube Scan
+      uses: kitabisa/sonarqube-action@master
+      with:
+        host: ${{ secrets.SONARQUBE_HOST }}
+        login: ${{ secrets.SONARQUBE_TOKEN }}
