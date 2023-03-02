@@ -1,6 +1,6 @@
 # CHANGELOG
 
-1.0.4 - 01/03/2023
+1.0.4 - 02/03/2023
 - fix bug handling additionalProperties if already defined with false value
 
 1.0.3 - 01/03/2023
