@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>it.imolinfo.maven.plugins</groupId>
 	<artifactId>openapi2jsonschema4j</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<packaging>maven-plugin</packaging>
 	
 	 <name>OpenAPI2JsonSchema4J</name>
@@ -43,8 +43,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.version>3.3.9</maven.version>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<jgitflow.maven.plugin>1.0-m5.1</jgitflow.maven.plugin>
+		<sonar.coverage.jacoco.xmlReportPaths>/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
 	<distributionManagement>
@@ -202,7 +204,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.0</version>
+				<version>0.8.8</version>
 				<executions>
 					<execution>
 						<id>jacoco-initialize</id>
@@ -216,6 +218,13 @@
 							<dumpOnExit>true</dumpOnExit>
 						</configuration>
 					</execution>
+					<execution>
+						<id>report</id>
+						<goals>
+						 <goal>report</goal>
+						</goals>
+						 <phase>package</phase>
+					  </execution>
 				</executions>
 			</plugin>
 
@@ -274,7 +283,7 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
-			<version>2.0</version>
+			<version>${maven.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
@@ -312,7 +321,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.16.18</version>
+			<version>1.18.26</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -410,6 +419,48 @@
 			<artifactId>swagger-inflector</artifactId>
 			<version>2.0.7</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+	        <groupId>org.eclipse.sisu</groupId>
+	        <artifactId>org.eclipse.sisu.plexus</artifactId>
+	        <version>0.3.3</version>
+	        <scope>test</scope>
+	    </dependency>
+    	<dependency>
+			<groupId>org.apache.maven.plugin-testing</groupId>
+			<artifactId>maven-plugin-testing-harness</artifactId>
+			<version>3.3.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+	        <groupId>org.apache.maven</groupId>
+	        <artifactId>maven-core</artifactId>
+	        <version>${maven.version}</version>
+	        <scope>test</scope>
+	    </dependency>  
+	    <dependency>
+	        <groupId>org.apache.maven</groupId>
+	        <artifactId>maven-artifact</artifactId>
+	        <version>${maven.version}</version>
+	        <scope>provided</scope>
+    	</dependency>
+        <dependency>
+	        <groupId>org.apache.maven</groupId>
+	        <artifactId>maven-compat</artifactId>
+	        <version>${maven.version}</version>
+	         <scope>provided</scope>
+	    </dependency>
+	    <dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		    <version>23.6-jre</version>
+		    <scope>test</scope>
+		</dependency> 
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpcore</artifactId>
+		    <version>4.4.8</version>
+		    <scope>test</scope>
 		</dependency>
 
 

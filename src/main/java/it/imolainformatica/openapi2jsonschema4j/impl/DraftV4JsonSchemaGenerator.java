@@ -75,8 +75,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 				res.put(PROPERTIES, ob.getProperties());
 				res.put(REQUIRED,ob.getRequired());
 				if (((ObjectSchema) ob).getAdditionalProperties()!=null) {
-					log.info("additionalProperties already exists...setting to true in json schema {}",((ObjectSchema) ob).getAdditionalProperties());
-					res.put(ADDITIONAL_PROPERTIES,true);
+					log.info("additionalProperties already exists... {}",((ObjectSchema) ob).getAdditionalProperties());
+					res.put(ADDITIONAL_PROPERTIES,((ObjectSchema) ob).getAdditionalProperties());
 				} else {
 					res.put(ADDITIONAL_PROPERTIES, !this.strict);
 				}
@@ -318,8 +318,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	@Override
 	public Map<String, JsonNode> generate(File interfaceFile) throws Exception {
 		readFromInterface(interfaceFile);
-		Map<String, JsonNode> schemas = generateForObjects();
-		return schemas;
+		return generateForObjects();
 	}
 
 	private void getAllKeys(Map<String, Object> jsonElements) {
@@ -347,7 +346,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 				});
 			}
 		}
-		if (nullable) {
+		if (Boolean.TRUE.equals(nullable)) {
 			String actualType = (String) jsonElements.get(TYPE);
 			jsonElements.put(TYPE, new String[]{actualType, NULL});
 		}

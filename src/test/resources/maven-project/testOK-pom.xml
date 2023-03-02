@@ -1,0 +1,28 @@
+
+<project>
+  <build>
+    <plugins>
+    <plugin>
+	<groupId>it.imolinfo.maven.plugins</groupId>
+	<artifactId>openapi2jsonschema4j</artifactId>
+	<configuration>
+		<strict>true</strict>
+		<outputDirectory>target</outputDirectory>
+		<interfaceFile>src/test/resources/petstore.json</interfaceFile>
+	</configuration>
+	<executions>
+		<execution>
+			<id>generate</id>
+			<phase>generate-sources</phase>
+			<configuration> 
+				
+			</configuration>
+			<goals>
+				<goal>generate</goal>
+			</goals>
+		</execution>
+	</executions>
+</plugin>
+        </plugins>
+  </build>
+</project>

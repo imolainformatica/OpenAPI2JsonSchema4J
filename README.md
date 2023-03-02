@@ -2,8 +2,7 @@
 
 Maven plugin that converts swagger 2.0/OAS 3.0.x schema objects into self contained json schema DRAFT_4 files for every request or response.
 
-[![Java CI with Maven](https://github.com/imolainformatica/OpenAPI2JsonSchema4J/actions/workflows/maven.yml/badge.svg?branch=develop)](https://github.com/imolainformatica/OpenAPI2JsonSchema4J/actions/workflows/maven.yml)
-
+[![Java CI with Maven](https://github.com/imolainformatica/OpenAPI2JsonSchema4J/actions/workflows/maven.yml/badge.svg?branch=develop)](https://github.com/imolainformatica/OpenAPI2JsonSchema4J/actions/workflows/maven.yml)[![Maven Central](https://maven-badges.herokuapp.com/maven-central/it.imolinfo.maven.plugins/openapi2jsonschema4j/badge.png?style=flat)](https://maven-badges.herokuapp.com/maven-central/it.imolinfo.maven.plugins/openapi2jsonschema4j)![Coverage](.github/badges/jacoco.svg)
 
 
 
@@ -48,24 +47,24 @@ Maven plugin that converts swagger 2.0/OAS 3.0.x schema objects into self contai
 
 ```xml
 <plugin>
-						<groupId>it.imolinfo.maven.plugins</groupId>
-						<artifactId>openapi2jsonschema4j</artifactId>
-						<version>1.0.1</version>
-						<configuration>
-							<strict>true</strict>
-						</configuration>
-						<executions>
-							<execution>
-								<id>exec-id</id>
-								<phase>generate-sources</phase>
-								<configuration> 
-									<outputDirectory>${basedir}/target/json-schema</outputDirectory>
-									<interfaceFile>${basedir}/path/to/swagger.json</interfaceFile>
-								</configuration>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
+	<groupId>it.imolinfo.maven.plugins</groupId>
+	<artifactId>openapi2jsonschema4j</artifactId>
+	<version>1.0.4</version>
+	<configuration>
+		<strict>true</strict>
+	</configuration>
+	<executions>
+		<execution>
+			<id>exec-id</id>
+			<phase>generate-sources</phase>
+			<configuration> 
+				<outputDirectory>${basedir}/target/json-schema</outputDirectory>
+				<interfaceFile>${basedir}/path/to/swagger.json</interfaceFile>
+			</configuration>
+			<goals>
+				<goal>generate</goal>
+			</goals>
+		</execution>
+	</executions>
+</plugin>
 ```
