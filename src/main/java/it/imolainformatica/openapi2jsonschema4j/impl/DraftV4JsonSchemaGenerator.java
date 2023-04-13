@@ -38,6 +38,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	private static final String WRITEONLY = "writeOnly";
 	private static final String EXTERNALDOCS = "externalDocs";
 	private static final String DEPRECATED = "deprecated";
+
+	private static final String JSONSCHEMA = "jsonSchema";
 	private static final String[] ignoreProperties = {ORIGINAL_REF,
 			EXAMPLESETFLAG,
 			EXAMPLE,
@@ -48,7 +50,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			READONLY,
 			WRITEONLY,
 			EXTERNALDOCS,
-			DEPRECATED};
+			DEPRECATED,
+			JSONSCHEMA};
 	private static final List<String> ignorePropertiesList = Arrays.asList(ignoreProperties);
 	public static final String NULL = "null";
 	private boolean strict;
