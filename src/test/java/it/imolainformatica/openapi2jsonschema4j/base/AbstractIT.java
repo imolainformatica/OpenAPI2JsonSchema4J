@@ -10,6 +10,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
+import com.github.fge.jsonschema.processors.syntax.SyntaxValidator;
 import io.swagger.oas.inflector.examples.ExampleBuilder;
 import io.swagger.oas.inflector.examples.models.Example;
 import io.swagger.oas.inflector.processors.JsonNodeExampleSerializer;
@@ -74,6 +75,7 @@ public class AbstractIT {
             log.info("jsonExample={}",jsonExample);
             JsonSchemaFactory schemaFactory = JsonSchemaFactory.byDefault();
             JsonSchema jsonSchema = schemaFactory.getJsonSchema(jsonSchemaNode);
+            validateJsonSchemaSyntax(schemaFactory.getSyntaxValidator(), jsonSchemaNode);
             ProcessingReport rep = jsonSchema.validate(new ObjectMapper().readTree(jsonExample));
             log.info("processing report for model {} = {}",objName,rep);
             Assert.assertTrue("Il json generato non è valido in base al json schema per l'oggetto "+objName, rep.isSuccess());
@@ -83,5 +85,10 @@ public class AbstractIT {
 
 
 
+    }
+
+    private void validateJsonSchemaSyntax(SyntaxValidator syntaxValidator, JsonNode node) {
+        ProcessingReport rep =  syntaxValidator.validateSchema(node);
+        Assert.assertTrue(rep.isSuccess());
     }
 }

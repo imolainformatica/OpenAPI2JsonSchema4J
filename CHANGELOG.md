@@ -1,5 +1,8 @@
 # CHANGELOG
 
+1.0.5 - 13/04/2023
+- removed additional "jsonSchema" field from json schema files when reading a swagger 2.0 file
+
 1.0.4 - 02/03/2023
 - fix bug handling additionalProperties if already defined with false value
 
