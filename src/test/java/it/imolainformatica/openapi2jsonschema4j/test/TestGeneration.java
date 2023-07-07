@@ -26,5 +26,10 @@ public class TestGeneration extends AbstractIT{
 		testForSwagger("petstoreNoBody.json");
 	}
 
+	@Test
+	public void testSwaggerWithAdditionalProperties() {
+		testForSwagger("petstoreAdditionalProperties.json");
+	}
+
 
 }
