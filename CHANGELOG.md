@@ -1,6 +1,6 @@
 # CHANGELOG
 
-1.0.5 - 07/07/2023
+1.0.6 - 07/07/2023
 - updated swagger-parser library due to a bug that could not read additionalProperties inside a model.
 
 1.0.5 - 13/04/2023
