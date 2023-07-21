@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>it.imolinfo.maven.plugins</groupId>
 	<artifactId>openapi2jsonschema4j</artifactId>
-	<version>1.0.5</version>
+	<version>1.0.6</version>
 	<packaging>maven-plugin</packaging>
 	
 	 <name>OpenAPI2JsonSchema4J</name>
@@ -378,7 +378,7 @@
 		<dependency>
 			<groupId>io.swagger.parser.v3</groupId>
 			<artifactId>swagger-parser</artifactId>
-			<version>2.1.1</version>
+			<version>2.1.16</version>
 		</dependency>
 
 		<dependency>
