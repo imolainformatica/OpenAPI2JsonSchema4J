@@ -67,7 +67,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	private Map<String, JsonNode> generateForObjects() throws Exception {
 		for (String ref : getMessageObjects()) {
 			String title = ref.replace(DEFINITIONS2, "");
-			Map<String, Object> defs = (Map<String, Object>) ((HashMap<String, Schema>) getObjectsDefinitions()).clone();
+			Map<String, Object> defs = (Map<String, Object>) ((HashMap<String, Schema>) getObjectsDefinitions()).clone();			
 			Schema<Object> ob = (Schema<Object>) defs.get(title);
 			defs.remove(title);
 			Map<String, Object> res = new HashMap<String, Object>();

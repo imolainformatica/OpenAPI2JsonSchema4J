@@ -49,6 +49,13 @@ public class BaseJsonSchemaGenerator {
 		po.setResolve(true);
 		SwaggerParseResult result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,po);
 		OpenAPI swagger = result.getOpenAPI();
+		if (swagger.getComponents() == null) {
+			log.info("Components missing. Trying again with flatten=true in case of inline schemas.");
+			po.setFlatten(true);
+			result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,po);
+			swagger = result.getOpenAPI();
+			log.debug("Flattened swagger : {}",swagger);
+		}
 		Validate.notNull(swagger,"Error during parsing of interface file "+interfaceFile.getAbsolutePath());
 		objectsDefinitions = swagger.getComponents().getSchemas();
 		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) {
