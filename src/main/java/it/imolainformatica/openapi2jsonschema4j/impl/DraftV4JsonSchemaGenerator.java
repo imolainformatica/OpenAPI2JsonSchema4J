@@ -297,24 +297,13 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			currentNode.fields().forEachRemaining(entry -> process(
 					!prefix.isEmpty() ? prefix + "-" + entry.getKey() : entry.getKey(), entry.getValue()));
 			ObjectNode on = ((ObjectNode) currentNode);
-			if (currentNode.get(TYPE) != null) {
-				String type = currentNode.get(TYPE).asText();
-				if ("object".equals(type)) {
-					if (on.get(ADDITIONAL_PROPERTIES)!=null) {
-						log.debug("already defined additionalProperties with value {}",on.get(ADDITIONAL_PROPERTIES).asText());
-					} else {
-						if (currentNode.get(PROPERTIES)!=null && currentNode.get(PROPERTIES).isEmpty()) {
-							//forcing additionalProps to true in case of type:object without props
-							on.set(ADDITIONAL_PROPERTIES, BooleanNode.valueOf(true));
-							log.debug("setting additional properties with value {} as this object has empty properties", true);
-						} else {
-							on.set(ADDITIONAL_PROPERTIES, BooleanNode.valueOf(!this.strict));
-							log.debug("setting additional properties with value {}", !this.strict);
-						}
-					}
+			if (currentNode.has(TYPE) && "object".equals(currentNode.get(TYPE).asText())) {
+				if (!currentNode.has(PROPERTIES) || !currentNode.get(PROPERTIES).fields().hasNext()) {
+					on.put(ADDITIONAL_PROPERTIES, true);
+					log.debug("setting additional properties with value {}", true);
 				}
 			}
-			if (currentNode.get(ORIGINAL_REF) != null) {
+			if (currentNode.has(ORIGINAL_REF)) {
 				on.remove(ORIGINAL_REF);
 				log.debug("removing originalRef field");
 			}
@@ -322,6 +311,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			log.debug(prefix + ": " + currentNode.toString());
 		}
 	}
+
+
 
 
 	private boolean isValidJsonSchemaSyntax(JsonNode jsonSchemaFile) {
