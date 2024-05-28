@@ -39,6 +39,11 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	private static final String EXTERNALDOCS = "externalDocs";
 	private static final String DEPRECATED = "deprecated";
 
+	private static final String ALLOF = "anyOf";
+	private static final String ONEOF = "oneOf";
+	private static final String ANYOF = "anyOf";
+	
+
 	private static final String JSONSCHEMA = "jsonSchema";
 
 	private static final String TYPES = "types";
@@ -86,6 +91,12 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 				} else {
 					res.put(ADDITIONAL_PROPERTIES, !this.strict);
 				}
+			}
+			if (ob instanceof ComposedSchema) {
+				res.put(TYPE, ((ComposedSchema) ob).getType());
+				res.put(ALLOF, ob.getAllOf());
+				res.put(ONEOF, ob.getOneOf());				
+				res.put(ANYOF, ob.getAnyOf());
 			}
 			if (ob instanceof ArraySchema) {
 				res.put(ITEMS, ((ArraySchema) ob).getItems());
@@ -245,7 +256,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			return;
 		for (String k : res.keySet()) {
 			if (res.get(k)!=null) {
-				log.debug("key={}",k);
+				log.debug("key={}   father={}",k,father);
 				if (!"properties".equals(father)) {
 					//devo rimuovere i valori da ignorare (solo se il padre non è un campo 'properties'
 					if (ignorePropertiesList.contains(k)) {
@@ -306,6 +317,10 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			if (currentNode.get(ORIGINAL_REF) != null) {
 				on.remove(ORIGINAL_REF);
 				log.debug("removing originalRef field");
+			}
+			if (currentNode.get(EXAMPLESETFLAG) != null) {
+				on.remove(EXAMPLESETFLAG);
+				log.debug("removing exampleSetFlag field");
 			}
 		} else {
 			log.debug(prefix + ": " + currentNode.toString());
