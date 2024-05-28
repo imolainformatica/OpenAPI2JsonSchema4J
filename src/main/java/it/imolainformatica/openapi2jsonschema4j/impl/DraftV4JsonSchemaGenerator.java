@@ -79,15 +79,25 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			if (ob instanceof ObjectSchema) {
 				res.put(TYPE, ((ObjectSchema) ob).getType());
 				res.put(PROPERTIES, ob.getProperties());
-				res.put(REQUIRED,ob.getRequired());
-				if (((ObjectSchema) ob).getAdditionalProperties()!=null) {
-					log.info("additionalProperties already exists... {}",((ObjectSchema) ob).getAdditionalProperties());
-					res.put(ADDITIONAL_PROPERTIES,((ObjectSchema) ob).getAdditionalProperties());
+				res.put(REQUIRED, ob.getRequired());
+
+				if (ob.getProperties() == null || ob.getProperties().isEmpty()) {
+					res.put(PROPERTIES, new HashMap<String, Schema>());
+					log.info("Object '{}' has no properties, creating empty properties object.", title);
+				}
+
+				if (((ObjectSchema) ob).getAdditionalProperties() != null) {
+					log.info("additionalProperties already exists... {}", ((ObjectSchema) ob).getAdditionalProperties());
+					res.put(ADDITIONAL_PROPERTIES, ((ObjectSchema) ob).getAdditionalProperties());
 				} else {
 					res.put(ADDITIONAL_PROPERTIES, !this.strict);
 				}
 			}
 			if (ob instanceof ArraySchema) {
+				Schema<?> items = ob.getItems();
+				if(items instanceof ObjectSchema && items.getProperties() == null){
+					log.info("Array items of type object has no properties");
+				}
 				res.put(ITEMS, ((ArraySchema) ob).getItems());
 				res.put(TYPE, ((ArraySchema) ob).getType());
 				res.put(MIN_ITEMS, ((ArraySchema) ob).getMinItems());
@@ -104,7 +114,6 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			getGeneratedObjects().put(title, postprocess(res));
 		}
 		return getGeneratedObjects();
-
 	}
 
 	private void removeUnusedObject(Map<String, Object> res, Schema<Object> ob) {
@@ -194,11 +203,16 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		} else if (p instanceof ArraySchema) {
 			ArraySchema ap = (ArraySchema) p;
 			log.debug("Array property={} items={}",ap,ap.getItems());
+			if(ap.getItems() instanceof ObjectSchema && ap.getItems().getProperties() == null ){
+				log.info("Array items of type object has no properties");
+			}
 			navigateSchema("items",ap.getItems(),usedDefinition,res);
 		} else if (p instanceof ObjectSchema){
 			ObjectSchema op = (ObjectSchema) p;
-			for (String name : op.getProperties().keySet()){
-				navigateSchema(name,op.getProperties().get(name),usedDefinition,res);
+			if(op.getProperties() != null) {
+				for (String name : op.getProperties().keySet()) {
+					navigateSchema(name, op.getProperties().get(name), usedDefinition, res);
+				}
 			}
 		} else if (p instanceof MapSchema) {
 			MapSchema mp = (MapSchema)p;
@@ -216,7 +230,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	}
 
 	private JsonNode postprocess(Map<String, Object> res) throws Exception {
-		//devo gestire i valori nullable potenzialmente presenti su oas 3.0
+        //need to handle all nullable oas3 possible values
 		res = handleNullableFields(res);
 		JsonNode jsonNode = removeNonJsonSchemaProperties(res);
 		process("", jsonNode);
@@ -238,8 +252,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		JsonNode jsonNode = mapper2.readValue(json, JsonNode.class);
 		return jsonNode;
 	}
-	
-	//rimuove tutte le properties di oas3 non gestite in json schema
+
+	//this method remove all unmanaged oas3 json schema props
 	private void iterateMap(Map<String, Object> res, String father) {
 		if (res==null)
 			return;
