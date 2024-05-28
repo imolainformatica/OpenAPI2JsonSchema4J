@@ -20,4 +20,7 @@ public class TestGenerationFromOAS3 extends AbstractIT {
     @Test
     public void testOAS3WithOneOf() { testForSwagger("petstoreoas3Oneof.json");}
 
+    @Test
+    public void testOAS3WithObjectTypeNull() { testForSwagger("petstoreoas3ObjectTypeNull.json");}
+
 }
