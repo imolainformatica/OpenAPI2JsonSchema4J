@@ -39,9 +39,11 @@ public class BaseJsonSchemaGenerator {
 	protected static final String ITEMS = "items";
 	protected static final String TYPE = "type";
 	@Getter
-	protected Set<String> messageObjects = new HashSet<String>();
+	protected Map<String,String> messageObjects = new HashMap<String,String>();
 	@Getter
 	private Map<String, Schema> objectsDefinitions = new HashMap<String, Schema>();
+
+	protected boolean isSwaggerFlattened = false;
 
 	
 	protected void readFromInterface(File interfaceFile) {
@@ -49,6 +51,14 @@ public class BaseJsonSchemaGenerator {
 		po.setResolve(true);
 		SwaggerParseResult result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,po);
 		OpenAPI swagger = result.getOpenAPI();
+		if (swagger.getComponents() == null) {
+			isSwaggerFlattened = true;
+			log.info("Components missing. Trying again with flatten=true in case of inline schemas.");
+			po.setFlatten(true);
+			result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,po);
+			swagger = result.getOpenAPI();
+			log.debug("Flattened swagger : {}",swagger);
+		}
 		Validate.notNull(swagger,"Error during parsing of interface file "+interfaceFile.getAbsolutePath());
 		objectsDefinitions = swagger.getComponents().getSchemas();
 		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) {
@@ -68,7 +78,12 @@ public class BaseJsonSchemaGenerator {
 					if (r.getContent().get(APPLICATION_JSON) != null) {
 						if (r.getContent().get(APPLICATION_JSON).getSchema().get$ref() != null) {
 							log.info("code={} responseSchema={}", key, r.getContent().get(APPLICATION_JSON).getSchema().get$ref());
-							messageObjects.add(r.getContent().get(APPLICATION_JSON).getSchema().get$ref());
+							if (isSwaggerFlattened) {
+								String t = op.getOperationId()+"response"+key;
+								messageObjects.put(r.getContent().get(APPLICATION_JSON).getSchema().get$ref(),t);
+							}else{
+								messageObjects.put(r.getContent().get(APPLICATION_JSON).getSchema().get$ref(),"");
+							}						
 						} else {
 							log.warn("code={} response schema is not a referenced definition! type={}", key, r.getContent().get("application/json").getClass());
 						}
@@ -78,14 +93,19 @@ public class BaseJsonSchemaGenerator {
 		}
 	}
 
-	private void findRequestBodySchema(Operation op, Set<String> messageObjects) {
+	private void findRequestBodySchema(Operation op, Map<String,String> messageObjects) {
 		if (op.getRequestBody()!=null) {
 			if (op.getRequestBody().getContent().get(APPLICATION_JSON)!=null) {
 				Schema sc = op.getRequestBody().getContent().get(APPLICATION_JSON).getSchema();
 				if (sc != null) {
 					log.info("Request schema={}", sc.get$ref());
 					if (sc.get$ref()!=null) {
-						messageObjects.add(sc.get$ref());
+						if (isSwaggerFlattened) {
+							String t = op.getOperationId()+"request";
+							messageObjects.put(sc.get$ref(),t);
+						}else{
+							messageObjects.put(sc.get$ref(),"");
+						}						
 					} else {
 						log.warn("Request schema is not a referenced definition!");
 					}

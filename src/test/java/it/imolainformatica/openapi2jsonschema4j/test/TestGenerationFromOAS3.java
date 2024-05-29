@@ -23,4 +23,6 @@ public class TestGenerationFromOAS3 extends AbstractIT {
     @Test
     public void testOAS3WithObjectTypeNull() { testForSwagger("petstoreoas3ObjectTypeNull.json");}
 
+    @Test
+    public void testOAS3WithComponentsInline() { testForSwagger("petstoreoas3ObjectInline.json");	}
 }
