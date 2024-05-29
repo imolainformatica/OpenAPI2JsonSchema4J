@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.datatype.jsr310.*;
+
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.*;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -65,7 +67,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	}
 
 	private Map<String, JsonNode> generateForObjects() throws Exception {
-		for (String ref : getMessageObjects()) {
+		for (String ref : getMessageObjects().keySet()) {
 			String title = ref.replace(DEFINITIONS2, "");
 			Map<String, Object> defs = (Map<String, Object>) ((HashMap<String, Schema>) getObjectsDefinitions()).clone();			
 			Schema<Object> ob = (Schema<Object>) defs.get(title);
@@ -74,7 +76,10 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			Map<String,Object> schemas = new HashMap<>();
 			schemas.put(SCHEMAS,defs);
 			res.put(COMPONENTS, schemas);
-			res.put(TITLE2, title);
+			if (isSwaggerFlattened) {
+				title = getMessageObjects().get(ref);
+			}
+			res.put(TITLE2, title);		
 			log.info("Generating json schema for object '{}' of type {}", title,ob.getClass());
 			if (ob instanceof ObjectSchema) {
 				res.put(TYPE, ((ObjectSchema) ob).getType());
@@ -101,7 +106,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			}
 			res.put($SCHEMA, HTTP_JSON_SCHEMA_ORG_DRAFT_04_SCHEMA);
 			removeUnusedObject(res,ob);
-			getGeneratedObjects().put(title, postprocess(res));
+			getGeneratedObjects().put(title, postprocess(res));			
 		}
 		return getGeneratedObjects();
 
