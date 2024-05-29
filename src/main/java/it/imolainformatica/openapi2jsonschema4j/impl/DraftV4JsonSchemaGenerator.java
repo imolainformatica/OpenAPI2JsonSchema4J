@@ -59,7 +59,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	public static final String NULL = "null";
 	private boolean strict;
 
-	
+
 	public DraftV4JsonSchemaGenerator(boolean strict) {
 		this.strict = strict;
 	}
@@ -79,15 +79,22 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			if (ob instanceof ObjectSchema) {
 				res.put(TYPE, ((ObjectSchema) ob).getType());
 				res.put(PROPERTIES, ob.getProperties());
-				res.put(REQUIRED,ob.getRequired());
-				if (((ObjectSchema) ob).getAdditionalProperties()!=null) {
-					log.info("additionalProperties already exists... {}",((ObjectSchema) ob).getAdditionalProperties());
-					res.put(ADDITIONAL_PROPERTIES,((ObjectSchema) ob).getAdditionalProperties());
+				res.put(REQUIRED, ob.getRequired());
+
+				if (ob.getProperties() == null || ob.getProperties().isEmpty()) {
+					res.put(PROPERTIES, new HashMap<String, Schema>());
+					log.info("Object '{}' has no properties, creating empty properties object.");
+					res.put(ADDITIONAL_PROPERTIES, true);
+					log.info("FORCED ADDITIONALPROPERTIES TO TRUE");
 				} else {
-					res.put(ADDITIONAL_PROPERTIES, !this.strict);
+					res.put(ADDITIONAL_PROPERTIES, ((ObjectSchema) ob).getAdditionalProperties() != null);
 				}
 			}
 			if (ob instanceof ArraySchema) {
+				Schema<?> items = ob.getItems();
+				if (items instanceof ObjectSchema && items.getProperties() == null) {
+					log.info("Array items of type object has no properties");
+				}
 				res.put(ITEMS, ((ArraySchema) ob).getItems());
 				res.put(TYPE, ((ArraySchema) ob).getType());
 				res.put(MIN_ITEMS, ((ArraySchema) ob).getMinItems());
@@ -96,15 +103,14 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			if (ob instanceof MapSchema) {
 				res.put(PROPERTIES, ((MapSchema) ob).getProperties());
 				res.put(TYPE, ((MapSchema) ob).getType());
-				res.put(REQUIRED,ob.getRequired());
-				res.put(ADDITIONAL_PROPERTIES,((MapSchema) ob).getAdditionalProperties());
+				res.put(REQUIRED, ob.getRequired());
+				res.put(ADDITIONAL_PROPERTIES, ((MapSchema) ob).getAdditionalProperties());
 			}
 			res.put($SCHEMA, HTTP_JSON_SCHEMA_ORG_DRAFT_04_SCHEMA);
-			removeUnusedObject(res,ob);
+			removeUnusedObject(res, ob);
 			getGeneratedObjects().put(title, postprocess(res));
 		}
 		return getGeneratedObjects();
-
 	}
 
 	private void removeUnusedObject(Map<String, Object> res, Schema<Object> ob) {
@@ -173,8 +179,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			if (ms.getAdditionalProperties() instanceof Schema) {
 				navigateSchema("", (Schema)ms.getAdditionalProperties(), usedDefinition, res);
 			}
-		
-	    } else if (ob instanceof Schema && ((Schema)ob).get$ref()!=null){
+
+		} else if (ob instanceof Schema && ((Schema)ob).get$ref()!=null){
 			navigateModel(((Schema)ob).get$ref(),usedDefinition,res,null);
 		}
 	}
@@ -194,11 +200,16 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		} else if (p instanceof ArraySchema) {
 			ArraySchema ap = (ArraySchema) p;
 			log.debug("Array property={} items={}",ap,ap.getItems());
+			if(ap.getItems() instanceof ObjectSchema && ap.getItems().getProperties() == null ){
+				log.info("Array items of type object has no properties");
+			}
 			navigateSchema("items",ap.getItems(),usedDefinition,res);
 		} else if (p instanceof ObjectSchema){
 			ObjectSchema op = (ObjectSchema) p;
-			for (String name : op.getProperties().keySet()){
-				navigateSchema(name,op.getProperties().get(name),usedDefinition,res);
+			if(op.getProperties() != null) {
+				for (String name : op.getProperties().keySet()) {
+					navigateSchema(name, op.getProperties().get(name), usedDefinition, res);
+				}
 			}
 		} else if (p instanceof MapSchema) {
 			MapSchema mp = (MapSchema)p;
@@ -216,7 +227,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	}
 
 	private JsonNode postprocess(Map<String, Object> res) throws Exception {
-		//devo gestire i valori nullable potenzialmente presenti su oas 3.0
+		//need to handle all nullable oas3 possible values
 		res = handleNullableFields(res);
 		JsonNode jsonNode = removeNonJsonSchemaProperties(res);
 		process("", jsonNode);
@@ -229,7 +240,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	}
 
 	private JsonNode removeNonJsonSchemaProperties(Map<String, Object> res) throws JsonProcessingException {
-		
+
 		iterateMap(res,null);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.setSerializationInclusion(Include.NON_NULL);
@@ -238,8 +249,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 		JsonNode jsonNode = mapper2.readValue(json, JsonNode.class);
 		return jsonNode;
 	}
-	
-	//rimuove tutte le properties di oas3 non gestite in json schema
+
+	//this method remove all unmanaged oas3 json schema props
 	private void iterateMap(Map<String, Object> res, String father) {
 		if (res==null)
 			return;
@@ -259,11 +270,11 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 				}
 			}
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 
 	private Map<String, Object> handleNullableFields(Map<String, Object> result) {
 		ObjectMapper mapper = new ObjectMapper();
@@ -286,24 +297,13 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			currentNode.fields().forEachRemaining(entry -> process(
 					!prefix.isEmpty() ? prefix + "-" + entry.getKey() : entry.getKey(), entry.getValue()));
 			ObjectNode on = ((ObjectNode) currentNode);
-			if (currentNode.get(TYPE) != null) {
-				String type = currentNode.get(TYPE).asText();
-				if ("object".equals(type)) {
-					if (on.get(ADDITIONAL_PROPERTIES)!=null) {
-						log.debug("already defined additionalProperties with value {}",on.get(ADDITIONAL_PROPERTIES).asText());
-					} else {
-						if (currentNode.get(PROPERTIES)!=null && currentNode.get(PROPERTIES).isEmpty()) {
-							//devo settare additionalProperties a true come di default se l'oggetto non specifica nessuna property
-							on.set(ADDITIONAL_PROPERTIES, BooleanNode.valueOf(true));
-							log.debug("setting additional properties with value {} as this object has empty properties", true);
-						} else {						
-							on.set(ADDITIONAL_PROPERTIES, BooleanNode.valueOf(!this.strict));
-							log.debug("setting additional properties with value {}", !this.strict);
-						}
-					}
+			if (currentNode.has(TYPE) && "object".equals(currentNode.get(TYPE).asText())) {
+				if (!currentNode.has(PROPERTIES) || !currentNode.get(PROPERTIES).fields().hasNext()) {
+					on.put(ADDITIONAL_PROPERTIES, true);
+					log.debug("setting additional properties with value {}", true);
 				}
 			}
-			if (currentNode.get(ORIGINAL_REF) != null) {
+			if (currentNode.has(ORIGINAL_REF)) {
 				on.remove(ORIGINAL_REF);
 				log.debug("removing originalRef field");
 			}
@@ -311,6 +311,8 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			log.debug(prefix + ": " + currentNode.toString());
 		}
 	}
+
+
 
 
 	private boolean isValidJsonSchemaSyntax(JsonNode jsonSchemaFile) {
