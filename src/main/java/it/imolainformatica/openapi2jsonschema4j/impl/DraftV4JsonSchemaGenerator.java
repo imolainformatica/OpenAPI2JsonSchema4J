@@ -15,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
@@ -72,7 +71,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	}
 
 	private Map<String, JsonNode> generateForObjects() throws Exception {
-		for (String ref : getMessageObjects().keySet()) {
+		for (String ref : getMessageObjects()) {
 			String title = ref.replace(DEFINITIONS2, "");
 			Map<String, Object> defs = (Map<String, Object>) ((HashMap<String, Schema>) getObjectsDefinitions()).clone();			
 			Schema<Object> ob = (Schema<Object>) defs.get(title);
@@ -81,9 +80,6 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			Map<String,Object> schemas = new HashMap<>();
 			schemas.put(SCHEMAS,defs);
 			res.put(COMPONENTS, schemas);
-			if (isSwaggerFlattened) {
-				title = getMessageObjects().get(ref);
-			}
 			res.put(TITLE2, title);		
 			log.info("Generating json schema for object '{}' of type {}", title,ob.getClass());
 			if (ob instanceof ObjectSchema) {

@@ -12,6 +12,8 @@ import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.parser.core.models.ParseOptions;
@@ -39,11 +41,9 @@ public class BaseJsonSchemaGenerator {
 	protected static final String ITEMS = "items";
 	protected static final String TYPE = "type";
 	@Getter
-	protected Map<String,String> messageObjects = new HashMap<String,String>();
+	protected Set<String> messageObjects = new HashSet<String>();
 	@Getter
 	private Map<String, Schema> objectsDefinitions = new HashMap<String, Schema>();
-
-	protected boolean isSwaggerFlattened = false;
 
 	
 	protected void readFromInterface(File interfaceFile) {
@@ -51,16 +51,10 @@ public class BaseJsonSchemaGenerator {
 		po.setResolve(true);
 		SwaggerParseResult result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,po);
 		OpenAPI swagger = result.getOpenAPI();
-		if (swagger.getComponents() == null) {
-			isSwaggerFlattened = true;
-			log.info("Components missing. Trying again with flatten=true in case of inline schemas.");
-			po.setFlatten(true);
-			result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,po);
-			swagger = result.getOpenAPI();
-			log.debug("Flattened swagger : {}",swagger);
-		}
 		Validate.notNull(swagger,"Error during parsing of interface file "+interfaceFile.getAbsolutePath());
-		objectsDefinitions = swagger.getComponents().getSchemas();
+		if (swagger.getComponents() != null && swagger.getComponents().getSchemas() != null) {
+			objectsDefinitions = swagger.getComponents().getSchemas();
+		}
 		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) {
 			String k = entry.getKey();
 			PathItem v = entry.getValue();
@@ -76,16 +70,17 @@ public class BaseJsonSchemaGenerator {
 				ApiResponse r = op.getResponses().get(key);
 				if (r.getContent()!=null) {
 					if (r.getContent().get(APPLICATION_JSON) != null) {
+						Schema sc = r.getContent().get(APPLICATION_JSON).getSchema();
 						if (r.getContent().get(APPLICATION_JSON).getSchema().get$ref() != null) {
 							log.info("code={} responseSchema={}", key, r.getContent().get(APPLICATION_JSON).getSchema().get$ref());
-							if (isSwaggerFlattened) {
-								String t = op.getOperationId()+"response"+key;
-								messageObjects.put(r.getContent().get(APPLICATION_JSON).getSchema().get$ref(),t);
-							}else{
-								messageObjects.put(r.getContent().get(APPLICATION_JSON).getSchema().get$ref(),"");
-							}						
+							messageObjects.add(r.getContent().get(APPLICATION_JSON).getSchema().get$ref());
 						} else {
 							log.warn("code={} response schema is not a referenced definition! type={}", key, r.getContent().get("application/json").getClass());
+							log.debug("Reference not found, creating it manually");
+							if (!(sc instanceof ArraySchema)) {
+								objectsDefinitions.put(op.getOperationId()+"response"+key, sc);
+								messageObjects.add(op.getOperationId()+"response"+key);
+							}							
 						}
 					}
 				}
@@ -93,21 +88,21 @@ public class BaseJsonSchemaGenerator {
 		}
 	}
 
-	private void findRequestBodySchema(Operation op, Map<String,String> messageObjects) {
+	private void findRequestBodySchema(Operation op, Set<String> messageObjects) {
 		if (op.getRequestBody()!=null) {
 			if (op.getRequestBody().getContent().get(APPLICATION_JSON)!=null) {
 				Schema sc = op.getRequestBody().getContent().get(APPLICATION_JSON).getSchema();
 				if (sc != null) {
 					log.info("Request schema={}", sc.get$ref());
 					if (sc.get$ref()!=null) {
-						if (isSwaggerFlattened) {
-							String t = op.getOperationId()+"request";
-							messageObjects.put(sc.get$ref(),t);
-						}else{
-							messageObjects.put(sc.get$ref(),"");
-						}						
+						messageObjects.add(sc.get$ref());			
 					} else {
 						log.warn("Request schema is not a referenced definition!");
+						log.debug("Ref not found, cresting it manually if object");
+						if (!(sc instanceof ArraySchema)) {
+							objectsDefinitions.put(op.getOperationId()+"request", sc);
+							messageObjects.add(op.getOperationId()+"request");
+						}
 					}
 				}
 			} else {

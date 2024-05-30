@@ -31,5 +31,4 @@ public class TestGeneration extends AbstractIT{
 		testForSwagger("petstoreAdditionalProperties.json");
 	}
 
-
 }

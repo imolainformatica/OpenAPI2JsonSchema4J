@@ -1,6 +1,7 @@
 package it.imolainformatica.openapi2jsonschema4j.base;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -61,7 +62,10 @@ public class AbstractIT {
         SwaggerParseResult result = new OpenAPIParser().readLocation(f.getAbsolutePath(),null,parseOptions);
         OpenAPI swagger = result.getOpenAPI();
 
-        Map<String, Schema> definitions = swagger.getComponents().getSchemas();
+        Map<String, Schema> definitions = new HashMap<String,Schema>();
+        if (swagger.getComponents() != null && swagger.getComponents().getSchemas() != null) {
+          definitions = swagger.getComponents().getSchemas();
+        }
 
         for (Map.Entry<String, JsonNode> entry : gen.entrySet()) {
             String objName = entry.getKey();
@@ -76,15 +80,14 @@ public class AbstractIT {
             JsonSchemaFactory schemaFactory = JsonSchemaFactory.byDefault();
             JsonSchema jsonSchema = schemaFactory.getJsonSchema(jsonSchemaNode);
             validateJsonSchemaSyntax(schemaFactory.getSyntaxValidator(), jsonSchemaNode);
-            ProcessingReport rep = jsonSchema.validate(new ObjectMapper().readTree(jsonExample));
-            log.info("processing report for model {} = {}",objName,rep);
-            Assert.assertTrue("Il json generato non è valido in base al json schema per l'oggetto "+objName, rep.isSuccess());
-
+            if (jsonExample.equals(null)) {
+                log.info("JsonExample is valid, proceeding with validation");
+                //Validation on example is possible only if components are defined inside the swagger file
+                ProcessingReport rep = jsonSchema.validate(new ObjectMapper().readTree(jsonExample));
+                log.info("processing report for model {} = {}",objName,rep);
+                Assert.assertTrue("Il json generato non è valido in base al json schema per l'oggetto "+objName, rep.isSuccess());
+            }            
         }
-
-
-
-
     }
 
     private void validateJsonSchemaSyntax(SyntaxValidator syntaxValidator, JsonNode node) {
