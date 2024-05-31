@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
@@ -93,7 +94,12 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 					res.put(ADDITIONAL_PROPERTIES, true);
 					log.info("FORCED ADDITIONALPROPERTIES TO TRUE");
 				} else {
-					res.put(ADDITIONAL_PROPERTIES, ((ObjectSchema) ob).getAdditionalProperties() != null);
+					if (((ObjectSchema) ob).getAdditionalProperties()!=null) {
+						log.info("additionalProperties already exists... {}",((ObjectSchema) ob).getAdditionalProperties());
+						res.put(ADDITIONAL_PROPERTIES,((ObjectSchema) ob).getAdditionalProperties());
+					} else {
+						res.put(ADDITIONAL_PROPERTIES, !this.strict);
+					}
 				}
 			}
 			if (ob instanceof ComposedSchema) {
@@ -310,9 +316,15 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 					!prefix.isEmpty() ? prefix + "-" + entry.getKey() : entry.getKey(), entry.getValue()));
 			ObjectNode on = ((ObjectNode) currentNode);
 			if (currentNode.has(TYPE) && "object".equals(currentNode.get(TYPE).asText())) {
+				if (on.get(ADDITIONAL_PROPERTIES) != null) {
+					log.debug("already defined additionalProperties with value {}",on.get(ADDITIONAL_PROPERTIES).asText());
+				}
 				if (!currentNode.has(PROPERTIES) || !currentNode.get(PROPERTIES).fields().hasNext()) {
 					on.put(ADDITIONAL_PROPERTIES, true);
 					log.debug("setting additional properties with value {}", true);
+				}else{
+					on.set(ADDITIONAL_PROPERTIES, BooleanNode.valueOf(!this.strict));
+					log.debug("setting additional properties with value {}", !this.strict);
 				}
 			}
 			if (currentNode.has(ORIGINAL_REF)) {
