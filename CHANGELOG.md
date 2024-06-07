@@ -1,5 +1,10 @@
 # CHANGELOG
 
+1.0.7 - 30/05/2024
+- fix bug while handling generation of oneOf construct inside json schema
+- fix issue preventing generation of schemas in case of objects without properties, forcing generation with additionalProperties enabled
+- fix issue preventing generation of json schemas with swagger files that have objects schemas defined inline rather than inside "components"
+
 1.0.6 - 07/07/2023
 - updated swagger-parser library due to a bug that could not read additionalProperties inside a model.
 
