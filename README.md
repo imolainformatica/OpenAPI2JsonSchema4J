@@ -12,8 +12,6 @@ Maven plugin that converts swagger 2.0/OAS 3.0.x schema objects into self contai
 
 
 - Each operation MUST have a non-empty OperationID field
-- Each operation MUST not declare inline request/response body but always reference to Object Schema (no error is thrown, only a warn log)
-
 
 
 
