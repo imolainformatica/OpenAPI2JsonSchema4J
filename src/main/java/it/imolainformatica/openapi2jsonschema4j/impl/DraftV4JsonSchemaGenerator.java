@@ -92,7 +92,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 					res.put(PROPERTIES, new HashMap<String, Schema>());
 					log.info("Object '{}' has no properties, creating empty properties object.");
 					res.put(ADDITIONAL_PROPERTIES, true);
-					log.info("FORCED ADDITIONALPROPERTIES TO TRUE");
+					log.warn("Forced additionalProperties=true for object {}",title);
 				} else {
 					if (((ObjectSchema) ob).getAdditionalProperties()!=null) {
 						log.info("additionalProperties already exists... {}",((ObjectSchema) ob).getAdditionalProperties());
