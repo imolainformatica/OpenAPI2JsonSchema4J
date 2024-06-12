@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class TestGeneration extends AbstractIT{
-
+ 
 	@Test
 	public void testPetStoreWithStrict() {
 		testForSwagger("petstore.json"); 
@@ -30,6 +30,5 @@ public class TestGeneration extends AbstractIT{
 	public void testSwaggerWithAdditionalProperties() {
 		testForSwagger("petstoreAdditionalProperties.json");
 	}
-
 
 }

@@ -12,6 +12,8 @@ import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.parser.core.models.ParseOptions;
@@ -50,7 +52,9 @@ public class BaseJsonSchemaGenerator {
 		SwaggerParseResult result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,po);
 		OpenAPI swagger = result.getOpenAPI();
 		Validate.notNull(swagger,"Error during parsing of interface file "+interfaceFile.getAbsolutePath());
-		objectsDefinitions = swagger.getComponents().getSchemas();
+		if (swagger.getComponents() != null && swagger.getComponents().getSchemas() != null) {
+			objectsDefinitions = swagger.getComponents().getSchemas();
+		}
 		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) {
 			String k = entry.getKey();
 			PathItem v = entry.getValue();
@@ -66,11 +70,17 @@ public class BaseJsonSchemaGenerator {
 				ApiResponse r = op.getResponses().get(key);
 				if (r.getContent()!=null) {
 					if (r.getContent().get(APPLICATION_JSON) != null) {
+						Schema sc = r.getContent().get(APPLICATION_JSON).getSchema();
 						if (r.getContent().get(APPLICATION_JSON).getSchema().get$ref() != null) {
 							log.info("code={} responseSchema={}", key, r.getContent().get(APPLICATION_JSON).getSchema().get$ref());
 							messageObjects.add(r.getContent().get(APPLICATION_JSON).getSchema().get$ref());
 						} else {
 							log.warn("code={} response schema is not a referenced definition! type={}", key, r.getContent().get("application/json").getClass());
+							log.debug("Reference not found, creating it manually");
+							if (!(sc instanceof ArraySchema)) {
+								objectsDefinitions.put(op.getOperationId()+"response"+key, sc);
+								messageObjects.add(op.getOperationId()+"response"+key);
+							}							
 						}
 					}
 				}
@@ -85,9 +95,14 @@ public class BaseJsonSchemaGenerator {
 				if (sc != null) {
 					log.info("Request schema={}", sc.get$ref());
 					if (sc.get$ref()!=null) {
-						messageObjects.add(sc.get$ref());
+						messageObjects.add(sc.get$ref());			
 					} else {
 						log.warn("Request schema is not a referenced definition!");
+						log.debug("Ref not found, cresting it manually if object");
+						if (!(sc instanceof ArraySchema)) {
+							objectsDefinitions.put(op.getOperationId()+"request", sc);
+							messageObjects.add(op.getOperationId()+"request");
+						}
 					}
 				}
 			} else {
