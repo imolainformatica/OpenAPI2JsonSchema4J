@@ -1,0 +1,296 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Swagger Petstore",
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "host": "petstore.swagger.io",
+  "basePath": "/v1",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/pets": {
+      "get": {
+        "summary": "List all pets",
+        "operationId": "listPets",
+        "tags": [
+          "pets"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "How many items to return at one time (max 100)",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "<table style=\"border-collapse: collapse; width: 499pt;\" width=\"665\">\n<tbody>\n<tr style=\"height: 14.5pt;\">\n<td style=\"height: 14.5pt; width: 65pt;\" width=\"86\">PAY.0003</td>\n<td style=\"width: 434pt;\" width=\"579\">Invalid parameter: {field name}</td>\n</tr>\n<tr style=\"height: 14.5pt;\">\n<td style=\"height: 14.5pt;\">PAY.0004</td>\n<td>Missing parameter: {field name}</td>\n</tr>\n</tbody>\n</table>",
+            "headers": {
+              "x-next": {
+                "type": "string",
+                "description": "A link to the next page of responses"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/Pets"
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a pet",
+        "operationId": "createPets",
+        "tags": [
+          "pets"
+        ],
+        "responses": {
+          "201": {
+            "description": "Null response"
+          },
+          "default": {
+            "description": "unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/pets/{petId}": {
+      "get": {
+        "summary": "Info for a specific pet",
+        "operationId": "showPetById",
+        "tags": [
+          "pets"
+        ],
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "description": "The id of the pet to retrieve",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request",
+            "schema": {
+              "$ref": "#/definitions/Pets"
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Pet": {
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^(?!\\s*$){1,34}$"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "extraInfo": {
+          "$ref": "#/definitions/Info"
+        },
+        "objectNoProps": {
+          "$ref": "#/definitions/Info6"
+        }
+      }
+    },
+    "Pets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Pet"
+      }
+    },
+    "Error": {
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "Info": {
+      "required": [
+        "name",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "nested": {
+          "$ref": "#/definitions/Info2"
+        }
+      }
+    },
+    "Info2": {
+      "required": [
+        "pippo",
+        "pluto"
+      ],
+      "properties": {
+        "pippo": {
+          "type": "string"
+        },
+        "pluto": {
+          "type": "string"
+        },
+        "circularInfo": {
+          "$ref": "#/definitions/Info"
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Info3"
+          }
+        },
+        "new": {
+          "type": "object",
+          "properties": {
+            "y": {
+              "type": "string"
+            },
+            "x": {
+              "$ref": "#/definitions/Info5"
+            }
+          }
+        }
+      }
+    },
+    "Info3": {
+      "required": [
+        "test"
+      ],
+      "properties": {
+        "test": {
+          "type": "string"
+        },
+        "elements2": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "test": {
+                "type": "string"
+              },
+              "obj": {
+                "$ref": "#/definitions/Info4"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Info4": {
+      "properties": {
+        "test2": {
+          "type": "string"
+        },
+        "map": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Info7"
+          }
+        },
+        "field": {
+          "$ref": "#/definitions/Info9"
+        }
+      }
+    },
+    "Info5": {
+      "properties": {
+        "test3": {
+          "type": "string"
+        }
+      }
+    },
+    "Info6": {
+      "type": "object"
+    },
+    "Info7": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseModel"
+        }],
+      "properties": {
+        "test4": {
+          "type": "string"
+        }
+      }
+    },
+    "BaseModel": {
+      "properties": {
+        "base": {
+          "type": "string"
+        },
+        "other": {
+          "$ref": "#/definitions/Info8"
+        }
+      }
+    },
+    "Info8": {
+      "properties": {
+        "xy": {
+          "type": "string"
+        }
+      }
+    },
+    "Info9": {
+      "properties": {
+        "zz": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

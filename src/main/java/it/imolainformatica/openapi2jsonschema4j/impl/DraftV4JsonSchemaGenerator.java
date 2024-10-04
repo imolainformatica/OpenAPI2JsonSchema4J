@@ -41,7 +41,7 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	private static final String EXTERNALDOCS = "externalDocs";
 	private static final String DEPRECATED = "deprecated";
 
-	private static final String ALLOF = "anyOf";
+	private static final String ALLOF = "allOf";
 	private static final String ONEOF = "oneOf";
 	private static final String ANYOF = "anyOf";
 	
@@ -206,7 +206,9 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 	private void lookComposedModel(List<Schema> schema, List<String> usedDefinition, Map<String, Object> res) {
 		if (schema!=null)
 			for (Schema m : schema) {
-				navigateModel(m.get$ref(), usedDefinition,res,null);
+				if (m.get$ref()!=null) {
+					navigateModel(m.get$ref(), usedDefinition, res, null);
+				}
 			}
 	}
 

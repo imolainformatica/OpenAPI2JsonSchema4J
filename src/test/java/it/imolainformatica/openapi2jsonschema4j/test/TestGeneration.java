@@ -15,6 +15,11 @@ public class TestGeneration extends AbstractIT{
 		testForSwagger("petstore.json"); 
 	}
 
+	@Test
+	public void testPetStoreWithRegex() {
+		testForSwagger("petstoreInvalidRegex.json");
+	}
+
 
 	@Test
 	public void testPetStoreWithStrictAndDateFormatAndPattern() {

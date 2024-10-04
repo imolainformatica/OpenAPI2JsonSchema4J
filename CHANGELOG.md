@@ -1,5 +1,8 @@
 # CHANGELOG
 
+1.0.8 . 
+- fix bug when handling generation of composed model with inline definitions
+
 1.0.7 - 30/05/2024
 - fix bug while handling generation of oneOf construct inside json schema
 - fix issue preventing generation of schemas in case of objects without properties, forcing generation with additionalProperties enabled
