@@ -1,0 +1,43 @@
+{
+  "components" : {
+    "schemas" : {
+      "CatNotFound" : {
+        "required" : [ "code", "message" ],
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "enum" : [ "CatNotFound" ]
+          },
+          "message" : {
+            "type" : "string",
+            "enum" : [ "Resource has not been found" ]
+          }
+        },
+        "additionalProperties" : false
+      },
+      "DogNotFound" : {
+        "required" : [ "code", "message" ],
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "enum" : [ "DogNotFound" ]
+          },
+          "message" : {
+            "type" : "string",
+            "enum" : [ "Resource has not been found" ]
+          }
+        },
+        "additionalProperties" : false
+      }
+    }
+  },
+  "oneOf" : [ {
+    "$ref" : "#/components/schemas/CatNotFound"
+  }, {
+    "$ref" : "#/components/schemas/DogNotFound"
+  } ],
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "title" : "CatOrDogNotFound"
+}

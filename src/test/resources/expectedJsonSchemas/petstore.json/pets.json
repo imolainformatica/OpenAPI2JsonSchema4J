@@ -1,0 +1,178 @@
+{
+  "components" : {
+    "schemas" : {
+      "Pet" : {
+        "required" : [ "id", "name" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "tag" : {
+            "type" : "string"
+          },
+          "extraInfo" : {
+            "$ref" : "#/components/schemas/Info"
+          },
+          "objectNoProps" : {
+            "$ref" : "#/components/schemas/Info6"
+          }
+        },
+        "additionalProperties" : false
+      },
+      "Info" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string"
+          },
+          "surname" : {
+            "type" : "string"
+          },
+          "nested" : {
+            "$ref" : "#/components/schemas/Info2"
+          }
+        },
+        "additionalProperties" : false
+      },
+      "Info2" : {
+        "required" : [ "pippo", "pluto" ],
+        "type" : "object",
+        "properties" : {
+          "pippo" : {
+            "type" : "string"
+          },
+          "pluto" : {
+            "type" : "string"
+          },
+          "circularInfo" : {
+            "$ref" : "#/components/schemas/Info"
+          },
+          "elements" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Info3"
+            }
+          },
+          "new" : {
+            "type" : "object",
+            "properties" : {
+              "y" : {
+                "type" : "string"
+              },
+              "x" : {
+                "$ref" : "#/components/schemas/Info5"
+              }
+            },
+            "additionalProperties" : false
+          }
+        },
+        "additionalProperties" : false
+      },
+      "Info3" : {
+        "required" : [ "test" ],
+        "type" : "object",
+        "properties" : {
+          "test" : {
+            "type" : "string"
+          },
+          "elements2" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "test" : {
+                  "type" : "string"
+                },
+                "obj" : {
+                  "$ref" : "#/components/schemas/Info4"
+                }
+              },
+              "additionalProperties" : false
+            }
+          }
+        },
+        "additionalProperties" : false
+      },
+      "Info4" : {
+        "type" : "object",
+        "properties" : {
+          "test2" : {
+            "type" : "string"
+          },
+          "map" : {
+            "type" : "object",
+            "additionalProperties" : true
+          },
+          "field" : {
+            "$ref" : "#/components/schemas/Info9"
+          }
+        },
+        "additionalProperties" : false
+      },
+      "Info5" : {
+        "type" : "object",
+        "properties" : {
+          "test3" : {
+            "type" : "string"
+          }
+        },
+        "additionalProperties" : false
+      },
+      "Info6" : {
+        "type" : "object",
+        "additionalProperties" : true
+      },
+      "Info7" : {
+        "properties" : {
+          "test4" : {
+            "type" : "string"
+          }
+        },
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/BaseModel"
+        } ]
+      },
+      "BaseModel" : {
+        "type" : "object",
+        "properties" : {
+          "base" : {
+            "type" : "string"
+          },
+          "other" : {
+            "$ref" : "#/components/schemas/Info8"
+          }
+        },
+        "additionalProperties" : false
+      },
+      "Info8" : {
+        "type" : "object",
+        "properties" : {
+          "xy" : {
+            "type" : "string"
+          }
+        },
+        "additionalProperties" : false
+      },
+      "Info9" : {
+        "type" : "object",
+        "properties" : {
+          "zz" : {
+            "type" : "string"
+          }
+        },
+        "additionalProperties" : false
+      }
+    }
+  },
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "title" : "Pets",
+  "type" : "array",
+  "items" : {
+    "$ref" : "#/components/schemas/Pet"
+  }
+}

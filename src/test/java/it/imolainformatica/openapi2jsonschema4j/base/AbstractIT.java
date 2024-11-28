@@ -1,8 +1,12 @@
 package it.imolainformatica.openapi2jsonschema4j.base;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +29,10 @@ import it.imolainformatica.openapi2jsonschema4j.builder.JsonSchemaGeneratorBuild
 import it.imolainformatica.openapi2jsonschema4j.impl.JsonSchemaOutputWriter;
 import junit.framework.Assert;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Slf4j
@@ -47,14 +54,18 @@ public class AbstractIT {
         IJsonSchemaGenerator jsg = new JsonSchemaGeneratorBuilder().withOutputSchemaVersion(JsonSchemaVersion.DRAFT_V4).withStrictGeneration(true).build();
         try {
             Map<String, JsonNode> gen = jsg.generate(f);
-            new JsonSchemaOutputWriter().saveJsonSchemaFiles(gen, new File("target/generatedJsonSchema/"+swaggerFile));
+            File outputJsonSchemaFolder =  new File("target/generatedJsonSchema/"+swaggerFile);
+            new JsonSchemaOutputWriter().saveJsonSchemaFiles(gen,outputJsonSchemaFolder);
             testGeneratedJsonSchema(f, gen);
+            File expectedJsonSchemaFolder = loadFromResourceFile("expectedJsonSchemas/"+swaggerFile);
+            compareJsonFolders(outputJsonSchemaFolder, expectedJsonSchemaFolder);
         } catch (Exception e) {
             log.error("Unexpected exception" + e.getMessage(), e);
             fail("Unexpected exception");
 
         }
     }
+
 
     private void testGeneratedJsonSchema(File f, Map<String, JsonNode> gen) throws ProcessingException, IOException {
         ParseOptions parseOptions = new ParseOptions();
@@ -93,5 +104,42 @@ public class AbstractIT {
     private void validateJsonSchemaSyntax(SyntaxValidator syntaxValidator, JsonNode node) {
         ProcessingReport rep =  syntaxValidator.validateSchema(node);
         Assert.assertTrue(rep.isSuccess());
+    }
+
+    // Ottiene una mappa di file JSON (nome file -> percorso) in una cartella
+    private static Map<String, Path> getJsonFilesMap(File folder) throws IOException {
+        try (Stream<Path> paths = Files.walk(folder.toPath())) {
+            return paths
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".json"))
+                    .collect(Collectors.toMap(path -> path.getFileName().toString(), path -> path));
+        }
+    }
+
+    private static boolean areJsonObjectsEqual(JSONObject json1, JSONObject json2) {
+        return json1.similar(json2);  // Confronta i contenuti, indipendentemente dall'ordine degli elementi
+    }
+
+    private static void compareJsonFolders(File outputJsonSchemaFolder, File expectedJsonSchemaFolder) throws IOException, JSONException {
+        log.info("Confronto tra cartelle {} e {}",outputJsonSchemaFolder,expectedJsonSchemaFolder);
+        // Verifica che entrambi i percorsi siano effettivamente cartelle
+        if (!outputJsonSchemaFolder.isDirectory() || !expectedJsonSchemaFolder.isDirectory()) {
+            throw new IllegalArgumentException("Entrambi i percorsi devono essere delle cartelle.");
+        }
+
+        // Ottieni i file JSON in entrambe le cartelle
+        Map<String, Path> filesInFolder1 = getJsonFilesMap(outputJsonSchemaFolder);
+        Map<String, Path> filesInFolder2 = getJsonFilesMap(expectedJsonSchemaFolder);
+        assertTrue(filesInFolder1.size() == filesInFolder2.size());
+        assertTrue(filesInFolder1.keySet().equals(filesInFolder2.keySet()));
+        // Confronta il contenuto di ogni file
+        for (String fileName : filesInFolder1.keySet()) {
+            log.info("Confronto file {}", fileName);
+            JSONObject json1 = new JSONObject(Files.readString(filesInFolder1.get(fileName)));
+            JSONObject json2 = new JSONObject(Files.readString(filesInFolder2.get(fileName)));
+            assertTrue("I file "+fileName+" non sono uguali",areJsonObjectsEqual(json1, json2));
+        }
+
+        assertTrue(true);
     }
 }

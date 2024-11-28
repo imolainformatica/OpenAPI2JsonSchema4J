@@ -1,0 +1,32 @@
+{
+  "components" : {
+    "schemas" : {
+      "Informazione" : {
+        "required" : [ "infoAggiuntive" ],
+        "type" : "object",
+        "properties" : {
+          "infoAggiuntive" : {
+            "type" : [ "string", "null" ]
+          }
+        },
+        "additionalProperties" : false
+      }
+    }
+  },
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "additionalProperties" : false,
+  "title" : "DettaglioProblema",
+  "type" : "object",
+  "properties" : {
+    "titolo" : {
+      "type" : [ "string", "null" ]
+    },
+    "tipo" : {
+      "type" : [ "string", "null" ]
+    },
+    "dettaglio" : {
+      "$ref" : "#/components/schemas/Informazione"
+    }
+  },
+  "required" : [ "dettaglio", "titolo" ]
+}

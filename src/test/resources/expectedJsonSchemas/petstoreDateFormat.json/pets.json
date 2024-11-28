@@ -1,0 +1,34 @@
+{
+  "components" : {
+    "schemas" : {
+      "Pet" : {
+        "required" : [ "id", "name" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "pattern" : "^string$",
+            "type" : "string"
+          },
+          "birth-date" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "tag" : {
+            "type" : "string"
+          }
+        },
+        "additionalProperties" : false
+      }
+    }
+  },
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "title" : "Pets",
+  "type" : "array",
+  "items" : {
+    "$ref" : "#/components/schemas/Pet"
+  }
+}

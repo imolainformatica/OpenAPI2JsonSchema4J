@@ -1,0 +1,57 @@
+{
+  "components" : {
+    "schemas" : {
+      "Category" : {
+        "type" : "object",
+        "additionalProperties" : true
+      },
+      "Tag" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "additionalProperties" : false
+      }
+    }
+  },
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "additionalProperties" : false,
+  "title" : "Pet",
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "integer",
+      "format" : "int64"
+    },
+    "name" : {
+      "type" : [ "string", "null" ]
+    },
+    "category" : {
+      "$ref" : "#/components/schemas/Category"
+    },
+    "photoUrls" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    },
+    "tags" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/Tag"
+      }
+    },
+    "status" : {
+      "type" : "string",
+      "description" : "pet status in the store",
+      "enum" : [ "available", "pending", "sold" ]
+    }
+  },
+  "required" : [ "name", "photoUrls" ]
+}
