@@ -26,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 public class BaseJsonSchemaGenerator {
 
 	public static final String APPLICATION_JSON = "application/json";
+	public static final String REQUEST = "request";
+	public static final String RESPONSE = "response";
 	@Getter
 	protected Map<String, JsonNode> generatedObjects = new HashMap<String, JsonNode>();
 	protected static final String ORIGINAL_REF = "originalRef";
@@ -77,16 +79,17 @@ public class BaseJsonSchemaGenerator {
 						} else {
 							log.warn("code={} response schema is not a referenced definition! type={}", key, r.getContent().get("application/json").getClass());
 							log.debug("Reference not found, creating it manually");
-							if (!(sc instanceof ArraySchema)) {
-								objectsDefinitions.put(op.getOperationId()+"response"+key, sc);
-								messageObjects.add(op.getOperationId()+"response"+key);
-							}							
+							String inlineObjectKey = createInlineResponseObjectKey(op,key);
+							objectsDefinitions.put(inlineObjectKey, sc);
+							messageObjects.add(inlineObjectKey);
 						}
 					}
 				}
 			}
 		}
 	}
+
+
 
 	private void findRequestBodySchema(Operation op, Set<String> messageObjects) {
 		if (op.getRequestBody()!=null) {
@@ -99,15 +102,22 @@ public class BaseJsonSchemaGenerator {
 					} else {
 						log.warn("Request schema is not a referenced definition!");
 						log.debug("Ref not found, cresting it manually if object");
-						if (!(sc instanceof ArraySchema)) {
-							objectsDefinitions.put(op.getOperationId()+"request", sc);
-							messageObjects.add(op.getOperationId()+"request");
-						}
+						String inlineObjectKey = createInlineRequestObjectKey(op);
+						objectsDefinitions.put(inlineObjectKey, sc);
+						messageObjects.add(inlineObjectKey);
 					}
 				}
 			} else {
 				log.info("No application body of type 'application/json' found for operation {}",op.getOperationId());
 			}
 		}
+	}
+
+	private String createInlineRequestObjectKey(Operation op) {
+		return op.getOperationId()+ REQUEST;
+	}
+
+	private String createInlineResponseObjectKey(Operation op, String responseKey) {
+		return op.getOperationId()+ RESPONSE +responseKey;
 	}
 }

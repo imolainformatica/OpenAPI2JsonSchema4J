@@ -175,7 +175,9 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			log.debug("array model={}",res.get(ITEMS));
 			if (res.get(ITEMS) instanceof Schema) {
 				Schema s = (Schema) res.get(ITEMS);
-				navigateModel(s.get$ref(),usedDefinition,res,null);
+				if (s.get$ref()!=null) {
+					navigateModel(s.get$ref(), usedDefinition, res, null);
+				}
 			}
 		} else if (ob instanceof ComposedSchema) {
 			ComposedSchema cm = (ComposedSchema)ob;
