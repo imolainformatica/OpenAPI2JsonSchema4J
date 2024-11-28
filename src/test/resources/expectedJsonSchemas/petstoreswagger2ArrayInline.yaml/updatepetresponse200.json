@@ -1,0 +1,62 @@
+{
+  "components" : {
+    "schemas" : { }
+  },
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "title" : "updatePetresponse200",
+  "type" : "array",
+  "items" : {
+    "required" : [ "name", "photoUrls" ],
+    "type" : "object",
+    "properties" : {
+      "tags" : {
+        "type" : "array",
+        "items" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "integer",
+              "format" : "int64"
+            },
+            "name" : {
+              "type" : "string"
+            }
+          },
+          "additionalProperties" : false
+        }
+      },
+      "category" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "additionalProperties" : false
+      },
+      "id" : {
+        "type" : "integer",
+        "format" : "int64"
+      },
+      "name" : {
+        "type" : "string"
+      },
+      "photoUrls" : {
+        "type" : "array",
+        "items" : {
+          "type" : "string"
+        }
+      },
+      "status" : {
+        "type" : "string",
+        "description" : "pet status in the store",
+        "enum" : [ "available", "pending", "sold" ]
+      }
+    },
+    "additionalProperties" : false
+  }
+}

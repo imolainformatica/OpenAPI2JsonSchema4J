@@ -21,6 +21,7 @@
   "paths": {
     "/pets": {
       "get": {
+        "operationId": "getPets",
         "responses": {
           "200": {
             "description":"list of pets",
