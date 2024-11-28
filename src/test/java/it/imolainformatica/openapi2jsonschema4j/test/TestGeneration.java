@@ -36,4 +36,9 @@ public class TestGeneration extends AbstractIT{
 		testForSwagger("petstoreAdditionalProperties.json");
 	}
 
+	@Test
+	public void testSwaggerWithInlineArray() {
+		testForSwagger("petstoreswagger2ArrayInline.yaml");
+	}
+
 }
