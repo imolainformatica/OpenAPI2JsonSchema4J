@@ -49,20 +49,23 @@ public class AbstractIT {
 	}
 
     protected void testForSwagger(String swaggerFile) {
-        log.info("Test for swagger {}", swaggerFile);
-        File f = loadFromResourceFile(swaggerFile);
         IJsonSchemaGenerator jsg = new JsonSchemaGeneratorBuilder().withOutputSchemaVersion(JsonSchemaVersion.DRAFT_V4).withStrictGeneration(true).build();
+        log.info("Test for swagger {}", swaggerFile);
+        File resourceFile = loadFromResourceFile(swaggerFile);
+        log.info("Test for resourcefile appenacaricatodalloswagger {}", resourceFile);
         try {
-            Map<String, JsonNode> gen = jsg.generate(f);
+            Map<String, JsonNode> generatedSchema = jsg.generate(resourceFile);
+            log.info("Confronto file generatedSchema QUELLOAPPENAGENERATOEDAFIXARE : {}", generatedSchema);
+            // salva e valida il jsonschema prodotto
             File outputJsonSchemaFolder =  new File("target/generatedJsonSchema/"+swaggerFile);
-            new JsonSchemaOutputWriter().saveJsonSchemaFiles(gen,outputJsonSchemaFolder);
-            testGeneratedJsonSchema(f, gen);
+            new JsonSchemaOutputWriter().saveJsonSchemaFiles(generatedSchema,outputJsonSchemaFolder);
+            testGeneratedJsonSchema(resourceFile, generatedSchema);
+            // confronta i json generato con atteso
             File expectedJsonSchemaFolder = loadFromResourceFile("expectedJsonSchemas/"+swaggerFile);
             compareJsonFolders(outputJsonSchemaFolder, expectedJsonSchemaFolder);
         } catch (Exception e) {
             log.error("Unexpected exception" + e.getMessage(), e);
             fail("Unexpected exception");
-
         }
     }
 
@@ -137,6 +140,8 @@ public class AbstractIT {
             log.info("Confronto file {}", fileName);
             JSONObject json1 = new JSONObject(Files.readString(filesInFolder1.get(fileName)));
             JSONObject json2 = new JSONObject(Files.readString(filesInFolder2.get(fileName)));
+            log.info("loooog file1 "+json1);
+            log.info("loooog file2 "+json2);
             assertTrue("I file "+fileName+" non sono uguali",areJsonObjectsEqual(json1, json2));
         }
 

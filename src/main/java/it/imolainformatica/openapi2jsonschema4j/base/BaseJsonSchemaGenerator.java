@@ -54,9 +54,25 @@ public class BaseJsonSchemaGenerator {
 		SwaggerParseResult result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,po);
 		OpenAPI swagger = result.getOpenAPI();
 		Validate.notNull(swagger,"Error during parsing of interface file "+interfaceFile.getAbsolutePath());
+		// comabiare swaggar a monte? for (ricorvsivamente lo navigo) {trasformare se c'è type mancante e propertioes popolato}
 		if (swagger.getComponents() != null && swagger.getComponents().getSchemas() != null) {
 			objectsDefinitions = swagger.getComponents().getSchemas();
+			log.info("looooogOBJECTDEFINITIONS " + objectsDefinitions.toString());
 		}
+		ObjectSchema objectSchemaDalVecchioSchema = new ObjectSchema();
+		for (Map.Entry<String, Schema> entry : objectsDefinitions.entrySet()){
+			log.info("ENTRYYYYYY class " + entry.getClass());
+			log.info("ENTRYYYYYY key " + entry.getKey());
+			log.info("ENTRYYYYYY value " + entry.getValue());
+			log.info("ENTRYYYYYY valueclass " + entry.getValue().getClass());
+			if (entry.getValue().getClass().toString().equals("class io.swagger.v3.oas.models.media.Schema") // instanceof
+				&& entry.getValue().getType()==null && entry.getValue().getProperties()!=null){
+				entry.getValue().setType("object"); // questo funzionerebbe se il problema fosse a valle, se no va generato un ObjectSchema dove qui c'è invece uno Schema
+				//ObjectSchema objectSchemaDalVecchioSchema = new ObjectSchema();
+				objectSchemaDalVecchioSchema.addAllOfItem(entry.getValue());
+			}
+		}
+		objectsDefinitions.put("Order", objectSchemaDalVecchioSchema);
 		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) {
 			String k = entry.getKey();
 			PathItem v = entry.getValue();
