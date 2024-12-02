@@ -81,8 +81,9 @@ public class BaseJsonSchemaGenerator {
 				// ObjectSchema objectSchemaDalVecchioSchema = (ObjectSchema) entry.getValue(); // ko cannot be cast
 				ObjectSchema objectSchemaDalVecchioSchema = new ObjectSchema(); // così in automatico si ha il "type": "object"
 				objectSchemaDalVecchioSchema.setProperties(entry.getValue().getProperties());
-				objectSchemaDalVecchioSchema.setAllOf(entry.getValue().getAllOf()); // todo rompe con allOf in Swagger2 (testPetStoreWithStrict e testPetStoreWithRegex allOf in "Info7")
 				// todo occorre fare set di tutti i campi, non solo le properties
+				objectSchemaDalVecchioSchema.setAllOf(entry.getValue().getAllOf());
+				// todo non va con allOf in Swagger2 (testPetStoreWithStrict e testPetStoreWithRegex allOf in "Info7") : entra qui con ComposedSchema ma il mapping non viene come da expected
 				objectsDefinitions.put(entry.getKey(), objectSchemaDalVecchioSchema); // man mano che scorre le key, sovrascrive il value
 			}
 		}
