@@ -59,9 +59,9 @@ public class BaseJsonSchemaGenerator {
 //		log.info("loooooog swaggerCompletoCosiComeLettoDaLIbreriaOpenapi components " + swagger.getComponents());
 //		if ( swagger.getComponents().getSchemas().get("Order").getType()==null ) {
 //			log.info("looog order typenull prima " + swagger.getComponents().getSchemas().get("Order").getType() );
-//			log.info("looog order classschema prima " + swagger.getComponents().getSchemas().get("Order").getClass() );
+//			log.info("looog order classschema prima " + swagger.getComponents().getSchemas().get("Order").getClass() ); // qui è già stato interpretato come Schema
 //			swagger.getComponents().getSchemas().get("Order").setType("object");
-//			ObjectSchema objectSchema = (ObjectSchema) swagger.getComponents().getSchemas().get("Order");
+//			ObjectSchema objectSchema = (ObjectSchema) swagger.getComponents().getSchemas().get("Order"); // cannot be cast
 //			swagger.getComponents().getSchemas().put("OrderFIX", objectSchema);
 //			log.info("looog order typenull dopo " + swagger.getComponents().getSchemas().get("Order").getType() );
 //			log.info("looog order classObjectschema dopo " + swagger.getComponents().getSchemas().get("Order").getClass() );
@@ -78,16 +78,17 @@ public class BaseJsonSchemaGenerator {
 			log.info("ENTRYYYYYY valueclass " + entry.getValue().getClass());
 			if ( entry.getValue() instanceof io.swagger.v3.oas.models.media.Schema // instanceof
 				&& entry.getValue().getType()==null && entry.getValue().getProperties()!=null ){ // va generato un ObjectSchema dove qui c'è invece uno Schema
-				ObjectSchema objectSchemaDalVecchioSchema = new ObjectSchema(); // così in automatico si setta il type "object"
-				objectSchemaDalVecchioSchema.setProperties(entry.getValue().getProperties());
-
 				// ObjectSchema objectSchemaDalVecchioSchema = (ObjectSchema) entry.getValue(); // ko cannot be cast
+				ObjectSchema objectSchemaDalVecchioSchema = new ObjectSchema(); // così in automatico si ha il "type": "object"
+				objectSchemaDalVecchioSchema.setProperties(entry.getValue().getProperties());
+				objectSchemaDalVecchioSchema.setAllOf(entry.getValue().getAllOf()); // todo rompe con allOf in Swagger2 (testPetStoreWithStrict e testPetStoreWithRegex allOf in "Info7")
+				// todo occorre fare set di tutti i campi, non solo le properties
 				objectsDefinitions.put(entry.getKey(), objectSchemaDalVecchioSchema); // man mano che scorre le key, sovrascrive il value
 			}
 		}
 		log.info("looooogOBJECTDEFINITIONS objectdefmodificato " + objectsDefinitions.toString());
 
-		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) {
+		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) { // todo qui se type object è assente occorre gestire come sopra
 			String k = entry.getKey();
 			PathItem v = entry.getValue();
 			analyzeOperation(v);
