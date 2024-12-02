@@ -124,7 +124,7 @@ public class AbstractIT {
     }
 
     private static void compareJsonFolders(File outputJsonSchemaFolder, File expectedJsonSchemaFolder) throws IOException, JSONException {
-        log.info("Confronto tra cartelle {} e {}",outputJsonSchemaFolder,expectedJsonSchemaFolder);
+        log.info("Confronto tra cartelle output {} e expected {}",outputJsonSchemaFolder,expectedJsonSchemaFolder);
         // Verifica che entrambi i percorsi siano effettivamente cartelle
         if (!outputJsonSchemaFolder.isDirectory() || !expectedJsonSchemaFolder.isDirectory()) {
             throw new IllegalArgumentException("Entrambi i percorsi devono essere delle cartelle.");
@@ -133,6 +133,9 @@ public class AbstractIT {
         // Ottieni i file JSON in entrambe le cartelle
         Map<String, Path> filesInFolder1 = getJsonFilesMap(outputJsonSchemaFolder);
         Map<String, Path> filesInFolder2 = getJsonFilesMap(expectedJsonSchemaFolder);
+        log.info("loooog filesInFolder1.size() "+ filesInFolder1.size());
+        log.info("loooog filesInFolder2.size() "+ filesInFolder2.size());
+
         assertTrue(filesInFolder1.size() == filesInFolder2.size());
         assertTrue(filesInFolder1.keySet().equals(filesInFolder2.keySet()));
         // Confronta il contenuto di ogni file

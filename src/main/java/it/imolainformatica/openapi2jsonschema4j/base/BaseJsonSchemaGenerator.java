@@ -55,41 +55,42 @@ public class BaseJsonSchemaGenerator {
 		OpenAPI swagger = result.getOpenAPI();
 		Validate.notNull(swagger,"Error during parsing of interface file "+interfaceFile.getAbsolutePath());
 		// combiare swaggar a monte? for (ricorsivamente lo navigo) {trasformare se c'è type mancante e propertioes popolato}
-		log.info("loooooog swaggerCompletoCosiComeLettoDaLIbreriaOpenapi paths " + swagger.getPaths());
-		log.info("loooooog swaggerCompletoCosiComeLettoDaLIbreriaOpenapi components " + swagger.getComponents());
-		if ( swagger.getComponents().getSchemas().get("Order").getType()==null ) {
-			log.info("looog order typenull prima " + swagger.getComponents().getSchemas().get("Order").getType() );
-			log.info("looog order classschema prima " + swagger.getComponents().getSchemas().get("Order").getClass() );
-			swagger.getComponents().getSchemas().get("Order").setType("object");
-			ObjectSchema objectSchema = (ObjectSchema) swagger.getComponents().getSchemas().get("Order");
-			swagger.getComponents().getSchemas().put("OrderFIX", objectSchema);
-			log.info("looog order typenull dopo " + swagger.getComponents().getSchemas().get("Order").getType() );
-			log.info("looog order classObjectschema dopo " + swagger.getComponents().getSchemas().get("Order").getClass() );
-		}
+//		log.info("loooooog swaggerCompletoCosiComeLettoDaLIbreriaOpenapi paths " + swagger.getPaths());
+//		log.info("loooooog swaggerCompletoCosiComeLettoDaLIbreriaOpenapi components " + swagger.getComponents());
+//		if ( swagger.getComponents().getSchemas().get("Order").getType()==null ) {
+//			log.info("looog order typenull prima " + swagger.getComponents().getSchemas().get("Order").getType() );
+//			log.info("looog order classschema prima " + swagger.getComponents().getSchemas().get("Order").getClass() );
+//			swagger.getComponents().getSchemas().get("Order").setType("object");
+//			ObjectSchema objectSchema = (ObjectSchema) swagger.getComponents().getSchemas().get("Order");
+//			swagger.getComponents().getSchemas().put("OrderFIX", objectSchema);
+//			log.info("looog order typenull dopo " + swagger.getComponents().getSchemas().get("Order").getType() );
+//			log.info("looog order classObjectschema dopo " + swagger.getComponents().getSchemas().get("Order").getClass() );
+//		}
 
 		if (swagger.getComponents() != null && swagger.getComponents().getSchemas() != null) {
 			objectsDefinitions = swagger.getComponents().getSchemas();
 			log.info("looooogOBJECTDEFINITIONS estratto da swagger.components.schemas " + objectsDefinitions.toString());
 		}
 		//Map<String, Schema> objectsDefinitionsUpdate = new HashMap<String, Schema>();
-//		for (Map.Entry<String, Schema> entry : objectsDefinitions.entrySet()){
-//			log.info("ENTRYYYYYY class " + entry.getClass());
-//			log.info("ENTRYYYYYY key " + entry.getKey());
-//			log.info("ENTRYYYYYY value " + entry.getValue());
-//			log.info("ENTRYYYYYY valueclass " + entry.getValue().getClass());
-//			if (//entry.getValue().getClass().toString().equals("class io.swagger.v3.oas.models.media.Schema") // instanceof
-//				( entry.getValue() instanceof io.swagger.v3.oas.models.media.Schema ) // instanceof
-//				&& entry.getValue().getType()==null && entry.getValue().getProperties()!=null
-//				){
-//				// va generato un ObjectSchema dove qui c'è invece uno Schema
-//				entry.getValue().setType("object");
-//				ObjectSchema objectSchemaDalVecchioSchema = (ObjectSchema) entry.getValue(); // ko non cannot be cast
-//				log.info("looooog objectSchemaDalVecchioSchema " + objectSchemaDalVecchioSchema);
-//				entry.setValue(objectSchemaDalVecchioSchema);
-//			}
-//		}
+		ObjectSchema objectSchemaDalVecchioSchema = new ObjectSchema(); // così in automatico si setta il type "object"
+		for (Map.Entry<String, Schema> entry : objectsDefinitions.entrySet()){
+			log.info("ENTRYYYYYY class " + entry.getClass());
+			log.info("ENTRYYYYYY key " + entry.getKey());
+			log.info("ENTRYYYYYY value " + entry.getValue());
+			log.info("ENTRYYYYYY valueclass " + entry.getValue().getClass());
+			if (//entry.getValue().getClass().toString().equals("class io.swagger.v3.oas.models.media.Schema") // instanceof
+				( entry.getValue() instanceof io.swagger.v3.oas.models.media.Schema ) // instanceof
+				&& entry.getValue().getType()==null && entry.getValue().getProperties()!=null
+				){ // va generato un ObjectSchema dove qui c'è invece uno Schema
+				// entry.getValue().setType("object");
+				objectSchemaDalVecchioSchema.setProperties(entry.getValue().getProperties());
+				// ObjectSchema objectSchemaDalVecchioSchema = (ObjectSchema) entry.getValue(); // ko cannot be cast
+				entry.setValue(objectSchemaDalVecchioSchema);
+			}
+		}
+		objectsDefinitions.put("Order", objectSchemaDalVecchioSchema);
 		log.info("looooogOBJECTDEFINITIONS objectdefmodificato " + objectsDefinitions.toString());
-		// log.info("ENTRYYYYYY valueclass objectdefmodificato " + objectsDefinitions.get("Order").getClass());
+		log.info("ENTRYYYYYY valueclass objectdefmodificato " + objectsDefinitions.get("Order").getClass());
 
 		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) {
 			String k = entry.getKey();
