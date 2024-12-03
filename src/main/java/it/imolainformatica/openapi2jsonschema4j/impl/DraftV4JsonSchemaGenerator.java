@@ -177,6 +177,14 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 				Schema s = (Schema) res.get(ITEMS);
 				if (s.get$ref()!=null) {
 					navigateModel(s.get$ref(), usedDefinition, res, null);
+				} else if (s instanceof ComposedSchema) {
+					ComposedSchema cm = (ComposedSchema)s;
+					lookComposedModel(cm.getAllOf(),usedDefinition,res);
+					lookComposedModel(cm.getAnyOf(),usedDefinition,res);
+					lookComposedModel(cm.getOneOf(),usedDefinition,res);
+					if (cm.getNot()!=null) {
+						navigateModel(cm.getNot().get$ref(), usedDefinition, res, null);
+					}
 				}
 			}
 		} else if (ob instanceof ComposedSchema) {
@@ -239,6 +247,15 @@ public class DraftV4JsonSchemaGenerator extends BaseJsonSchemaGenerator implemen
 			if (mp.getAdditionalProperties() instanceof Schema ) {
 				navigateSchema(mp.getName(), (Schema)mp.getAdditionalProperties(), usedDefinition, res);
 			}
+		} else if (p instanceof ComposedSchema){
+			ComposedSchema cm = (ComposedSchema)p;
+			lookComposedModel(cm.getAllOf(),usedDefinition,res);
+			lookComposedModel(cm.getAnyOf(),usedDefinition,res);
+			lookComposedModel(cm.getOneOf(),usedDefinition,res);
+			if (cm.getNot()!=null) {
+				navigateModel(cm.getNot().get$ref(), usedDefinition, res, null);
+			}
+
 		} else {
 			log.debug(p.getClass() + " - nothing to do!");
 		}

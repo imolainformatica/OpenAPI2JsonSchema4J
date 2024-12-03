@@ -146,12 +146,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {"$ref": "#/components/schemas/One"},
-                      {"$ref": "#/components/schemas/Two"}
-                    ]
+                  "properties": {
+                    "id": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {"$ref": "#/components/schemas/One"},
+                          {"$ref": "#/components/schemas/Two"}
+                        ]
+                      }
+                    }
                   }
                 }
               }

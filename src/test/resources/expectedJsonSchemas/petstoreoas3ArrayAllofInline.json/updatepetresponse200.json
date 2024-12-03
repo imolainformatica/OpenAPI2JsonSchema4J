@@ -1,9 +1,40 @@
 {
   "components" : {
-    "schemas" : { }
+    "schemas" : {
+      "One" : {
+        "type" : "object",
+        "properties" : {
+          "property1" : {
+            "type" : "string"
+          }
+        },
+        "additionalProperties" : false
+      },
+      "Two" : {
+        "type" : "object",
+        "properties" : {
+          "property2" : {
+            "type" : "string"
+          }
+        },
+        "additionalProperties" : false
+      }
+    }
   },
   "$schema" : "http://json-schema.org/draft-04/schema#",
+  "additionalProperties" : false,
   "title" : "updatePetresponse200",
-  "type" : "array",
-  "items" : { }
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "array",
+      "items" : {
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/One"
+        }, {
+          "$ref" : "#/components/schemas/Two"
+        } ]
+      }
+    }
+  }
 }
