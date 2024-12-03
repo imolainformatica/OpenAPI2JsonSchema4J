@@ -52,7 +52,21 @@
             }
           },
           "405": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "enum": [
+                        "Error"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

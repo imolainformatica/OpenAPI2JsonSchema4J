@@ -112,7 +112,12 @@ public class BaseJsonSchemaGenerator {
 							log.warn("code={} response schema is not a referenced definition! type={}", key, r.getContent().get("application/json").getClass());
 							log.debug("Reference not found, creating it manually");
 							String inlineObjectKey = createInlineResponseObjectKey(op,key);
-							objectsDefinitions.put(inlineObjectKey, sc);
+							if (sc.getType() == null && sc.getProperties()!=null) {
+								ObjectSchema newObjectSchema = createObjectSchemaFromSchema(sc);
+								r.getContent().get(APPLICATION_JSON).setSchema(newObjectSchema);
+								objectsDefinitions.put(inlineObjectKey, newObjectSchema);
+							} else
+								objectsDefinitions.put(inlineObjectKey, sc);
 							messageObjects.add(inlineObjectKey);
 						}
 					}
