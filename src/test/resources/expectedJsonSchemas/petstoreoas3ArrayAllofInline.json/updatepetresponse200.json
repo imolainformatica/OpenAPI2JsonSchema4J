@@ -1,0 +1,9 @@
+{
+  "components" : {
+    "schemas" : { }
+  },
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "title" : "updatePetresponse200",
+  "type" : "array",
+  "items" : { }
+}
