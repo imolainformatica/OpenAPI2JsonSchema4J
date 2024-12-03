@@ -1,6 +1,7 @@
 package it.imolainformatica.openapi2jsonschema4j.base;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -32,8 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 @Slf4j
 public class AbstractIT {
@@ -41,11 +41,9 @@ public class AbstractIT {
 
 	protected File loadFromResourceFile(String resourceName) {
 		log.debug("loading resource {}",resourceName);
-		File file = new File(
+		return new File(
 				getClass().getClassLoader().getResource(resourceName).getFile()
 			);
-		return file;
-		
 	}
 
     protected void testForSwagger(String swaggerFile) {
@@ -99,14 +97,14 @@ public class AbstractIT {
                 //Validation on example is possible only if components are defined inside the swagger file
                 ProcessingReport rep = jsonSchema.validate(new ObjectMapper().readTree(jsonExample));
                 log.info("processing report for model {} = {}",objName,rep);
-                Assert.assertTrue("Il json generato non è valido in base al json schema per l'oggetto "+objName, rep.isSuccess());
+                assertTrue("Il json generato non è valido in base al json schema per l'oggetto "+objName, rep.isSuccess());
             }            
         }
     }
 
     private void validateJsonSchemaSyntax(SyntaxValidator syntaxValidator, JsonNode node) {
         ProcessingReport rep =  syntaxValidator.validateSchema(node);
-        Assert.assertTrue(rep.isSuccess());
+        assertTrue(rep.isSuccess());
     }
 
     // Ottiene una mappa di file JSON (nome file -> percorso) in una cartella
@@ -136,18 +134,22 @@ public class AbstractIT {
         log.info("loooog filesInFolder1.size() "+ filesInFolder1.size());
         log.info("loooog filesInFolder2.size() "+ filesInFolder2.size());
 
-        assertTrue(filesInFolder1.size() == filesInFolder2.size());
-        assertTrue(filesInFolder1.keySet().equals(filesInFolder2.keySet()));
+        assertEquals(filesInFolder1.size() , filesInFolder2.size());
+        assertEquals(filesInFolder1.keySet(),filesInFolder2.keySet());
         // Confronta il contenuto di ogni file
         for (String fileName : filesInFolder1.keySet()) {
             log.info("Confronto file {}", fileName);
-            JSONObject json1 = new JSONObject(Files.readString(filesInFolder1.get(fileName)));
-            JSONObject json2 = new JSONObject(Files.readString(filesInFolder2.get(fileName)));
-            log.info("loooog file1 "+json1);
-            log.info("loooog file2 "+json2);
+            JSONObject json1 = new JSONObject(readString(filesInFolder1.get(fileName)));
+            JSONObject json2 = new JSONObject(readString(filesInFolder2.get(fileName)));
+            log.debug("loooog file1 "+json1);
+            log.debug("loooog file2 "+json2);
             assertTrue("I file "+fileName+" non sono uguali",areJsonObjectsEqual(json1, json2));
         }
 
         assertTrue(true);
+    }
+
+    private static String readString(Path path) throws IOException {
+        return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
     }
 }

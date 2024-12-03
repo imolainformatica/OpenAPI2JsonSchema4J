@@ -54,46 +54,46 @@ public class BaseJsonSchemaGenerator {
 		SwaggerParseResult result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,po);
 		OpenAPI swagger = result.getOpenAPI();
 		Validate.notNull(swagger,"Error during parsing of interface file "+interfaceFile.getAbsolutePath());
-		// combiare swaggar a monte? for (ricorsivamente lo navigo) {trasformare se c'è type mancante e propertioes popolato}
-//		log.info("loooooog swaggerCompletoCosiComeLettoDaLIbreriaOpenapi paths " + swagger.getPaths());
-//		log.info("loooooog swaggerCompletoCosiComeLettoDaLIbreriaOpenapi components " + swagger.getComponents());
-//		if ( swagger.getComponents().getSchemas().get("Order").getType()==null ) {
-//			log.info("looog order typenull prima " + swagger.getComponents().getSchemas().get("Order").getType() );
-//			log.info("looog order classschema prima " + swagger.getComponents().getSchemas().get("Order").getClass() ); // qui è già stato interpretato come Schema
-//			swagger.getComponents().getSchemas().get("Order").setType("object");
-//			ObjectSchema objectSchema = (ObjectSchema) swagger.getComponents().getSchemas().get("Order"); // cannot be cast
-//			swagger.getComponents().getSchemas().put("OrderFIX", objectSchema);
-//			log.info("looog order typenull dopo " + swagger.getComponents().getSchemas().get("Order").getType() );
-//			log.info("looog order classObjectschema dopo " + swagger.getComponents().getSchemas().get("Order").getClass() );
-//		}
 
 		if (swagger.getComponents() != null && swagger.getComponents().getSchemas() != null) {
 			objectsDefinitions = swagger.getComponents().getSchemas();
-			log.info("looooogOBJECTDEFINITIONS estratto da swagger.components.schemas " + objectsDefinitions.toString());
 		}
 		for (Map.Entry<String, Schema> entry : objectsDefinitions.entrySet()){
-			log.info("ENTRYYYYYY class " + entry.getClass());
-			log.info("ENTRYYYYYY key " + entry.getKey());
-			log.info("ENTRYYYYYY value " + entry.getValue());
-			log.info("ENTRYYYYYY valueclass " + entry.getValue().getClass());
-			if ( entry.getValue() instanceof io.swagger.v3.oas.models.media.Schema // instanceof
+			if ( entry.getValue().getClass().equals(io.swagger.v3.oas.models.media.Schema.class)
 				&& entry.getValue().getType()==null && entry.getValue().getProperties()!=null ){ // va generato un ObjectSchema dove qui c'è invece uno Schema
-				// ObjectSchema objectSchemaDalVecchioSchema = (ObjectSchema) entry.getValue(); // ko cannot be cast
-				ObjectSchema objectSchemaDalVecchioSchema = new ObjectSchema(); // così in automatico si ha il "type": "object"
-				objectSchemaDalVecchioSchema.setProperties(entry.getValue().getProperties());
-				// todo occorre fare set di tutti i campi, non solo le properties
-				objectSchemaDalVecchioSchema.setAllOf(entry.getValue().getAllOf());
-				// todo non va con allOf in Swagger2 (testPetStoreWithStrict e testPetStoreWithRegex allOf in "Info7") : entra qui con ComposedSchema ma il mapping non viene come da expected
-				objectsDefinitions.put(entry.getKey(), objectSchemaDalVecchioSchema); // man mano che scorre le key, sovrascrive il value
+				ObjectSchema newObjectSchema = createObjectSchemaFromSchema(entry.getValue());
+				log.info("Conversion to ObjectSchema for type {}", entry.getKey());
+				objectsDefinitions.put(entry.getKey(), newObjectSchema); // man mano che scorre le key, sovrascrive il value
 			}
 		}
-		log.info("looooogOBJECTDEFINITIONS objectdefmodificato " + objectsDefinitions.toString());
-
 		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) { // todo qui se type object è assente occorre gestire come sopra
 			String k = entry.getKey();
 			PathItem v = entry.getValue();
 			analyzeOperation(v);
 		}
+	}
+
+	private ObjectSchema createObjectSchemaFromSchema(Schema schema) {
+		ObjectSchema objectSchema = new ObjectSchema();
+		// Copia delle proprietà generali
+		objectSchema.setTitle(schema.getTitle());
+		objectSchema.setDescription(schema.getDescription());
+		objectSchema.setDefault(schema.getDefault());
+		objectSchema.setExample(schema.getExample());
+		objectSchema.setNullable(schema.getNullable());
+		objectSchema.setDeprecated(schema.getDeprecated());
+		objectSchema.setReadOnly(schema.getReadOnly());
+		objectSchema.setWriteOnly(schema.getWriteOnly());
+		objectSchema.setRequired(schema.getRequired());
+		objectSchema.setFormat(schema.getFormat());
+		objectSchema.setExtensions(schema.getExtensions());
+		objectSchema.setAdditionalProperties(schema.getAdditionalProperties());
+
+		// Copia delle proprietà specifiche per ObjectSchema
+		objectSchema.setProperties(schema.getProperties());
+		objectSchema.setDiscriminator(schema.getDiscriminator());
+		objectSchema.setAdditionalProperties(schema.getAdditionalProperties());
+		return objectSchema;
 	}
 
 	private void analyzeOperation(PathItem v) {
