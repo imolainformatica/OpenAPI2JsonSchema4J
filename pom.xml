@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>it.imolinfo.maven.plugins</groupId>
 	<artifactId>openapi2jsonschema4j</artifactId>
-	<version>1.0.8-SNAPSHOT</version>
+	<version>1.0.8</version>
 	<packaging>maven-plugin</packaging>
 	
 	 <name>OpenAPI2JsonSchema4J</name>
