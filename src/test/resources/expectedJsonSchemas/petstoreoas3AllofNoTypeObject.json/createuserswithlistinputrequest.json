@@ -1,0 +1,45 @@
+{
+  "components" : {
+    "schemas" : {
+      "User" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "username" : {
+            "type" : "string"
+          },
+          "firstName" : {
+            "type" : [ "string", "null" ]
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "password" : {
+            "type" : "string"
+          },
+          "phone" : {
+            "type" : "string"
+          },
+          "userStatus" : {
+            "type" : "integer",
+            "description" : "User Status",
+            "format" : "int32"
+          }
+        },
+        "additionalProperties" : false
+      }
+    }
+  },
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "title" : "createUsersWithListInputrequest",
+  "type" : "array",
+  "items" : {
+    "$ref" : "#/components/schemas/User"
+  }
+}

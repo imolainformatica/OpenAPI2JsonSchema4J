@@ -54,14 +54,46 @@ public class BaseJsonSchemaGenerator {
 		SwaggerParseResult result = new OpenAPIParser().readLocation(interfaceFile.getAbsolutePath(),null,po);
 		OpenAPI swagger = result.getOpenAPI();
 		Validate.notNull(swagger,"Error during parsing of interface file "+interfaceFile.getAbsolutePath());
+
 		if (swagger.getComponents() != null && swagger.getComponents().getSchemas() != null) {
 			objectsDefinitions = swagger.getComponents().getSchemas();
 		}
-		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) {
+		for (Map.Entry<String, Schema> entry : objectsDefinitions.entrySet()){
+			if ( entry.getValue().getClass().equals(io.swagger.v3.oas.models.media.Schema.class)
+				&& entry.getValue().getType()==null && entry.getValue().getProperties()!=null ){ // va generato un ObjectSchema dove qui c'è invece uno Schema
+				ObjectSchema newObjectSchema = createObjectSchemaFromSchema(entry.getValue());
+				log.info("Conversion to ObjectSchema for type {}", entry.getKey());
+				objectsDefinitions.put(entry.getKey(), newObjectSchema); // man mano che scorre le key, sovrascrive il value
+			}
+		}
+		for (Map.Entry<String, PathItem> entry : swagger.getPaths().entrySet()) { // todo qui se type object è assente occorre gestire come sopra
 			String k = entry.getKey();
 			PathItem v = entry.getValue();
 			analyzeOperation(v);
 		}
+	}
+
+	private ObjectSchema createObjectSchemaFromSchema(Schema schema) {
+		ObjectSchema objectSchema = new ObjectSchema();
+		// Copia delle proprietà generali
+		objectSchema.setTitle(schema.getTitle());
+		objectSchema.setDescription(schema.getDescription());
+		objectSchema.setDefault(schema.getDefault());
+		objectSchema.setExample(schema.getExample());
+		objectSchema.setNullable(schema.getNullable());
+		objectSchema.setDeprecated(schema.getDeprecated());
+		objectSchema.setReadOnly(schema.getReadOnly());
+		objectSchema.setWriteOnly(schema.getWriteOnly());
+		objectSchema.setRequired(schema.getRequired());
+		objectSchema.setFormat(schema.getFormat());
+		objectSchema.setExtensions(schema.getExtensions());
+		objectSchema.setAdditionalProperties(schema.getAdditionalProperties());
+
+		// Copia delle proprietà specifiche per ObjectSchema
+		objectSchema.setProperties(schema.getProperties());
+		objectSchema.setDiscriminator(schema.getDiscriminator());
+		objectSchema.setAdditionalProperties(schema.getAdditionalProperties());
+		return objectSchema;
 	}
 
 	private void analyzeOperation(PathItem v) {
@@ -80,7 +112,12 @@ public class BaseJsonSchemaGenerator {
 							log.warn("code={} response schema is not a referenced definition! type={}", key, r.getContent().get("application/json").getClass());
 							log.debug("Reference not found, creating it manually");
 							String inlineObjectKey = createInlineResponseObjectKey(op,key);
-							objectsDefinitions.put(inlineObjectKey, sc);
+							if (sc.getType() == null && sc.getProperties()!=null) {
+								ObjectSchema newObjectSchema = createObjectSchemaFromSchema(sc);
+								r.getContent().get(APPLICATION_JSON).setSchema(newObjectSchema);
+								objectsDefinitions.put(inlineObjectKey, newObjectSchema);
+							} else
+								objectsDefinitions.put(inlineObjectKey, sc);
 							messageObjects.add(inlineObjectKey);
 						}
 					}

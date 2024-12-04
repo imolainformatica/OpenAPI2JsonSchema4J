@@ -1,0 +1,18 @@
+{
+    "components": {
+        "schemas": {}
+    },
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "placeOrderresponse405",
+    "type": "object",
+      "additionalProperties" : false,
+    "properties": {
+        "message": {
+            "type": "string",
+            "enum": [
+                "Error"
+            ]
+        }
+    }
+
+}

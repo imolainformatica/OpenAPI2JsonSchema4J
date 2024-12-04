@@ -1,0 +1,15 @@
+{
+  "components" : {
+    "schemas" : { }
+  },
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "additionalProperties" : false,
+  "title" : "OrderBis",
+  "type" : "object",
+  "properties" : {
+    "idBIS" : {
+      "type" : "integer",
+      "format" : "int64"
+    }
+  }
+}
